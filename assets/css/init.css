@@ -1,0 +1,18 @@
+body,ol,ul,h1,h2,h3,h4,h5,h6,p,th,td,dl,dd,form,fieldset,legend,input,textarea,select{margin:0;padding:0} 
+body{font:12px "Roboto","Arial Narrow",HELVETICA;background:#fff;-webkit-text-size-adjust:100%;} 
+a{color:#2d374b;text-decoration:none} 
+a:hover{color:#cd0200;text-decoration:underline} 
+em{font-style:normal} 
+li{list-style:none} 
+img{border:0;vertical-align:middle} 
+table{border-collapse:collapse;border-spacing:0} 
+p{word-wrap:break-word}
+
+.PhotoCard {
+	background-position:0% -100%;
+	transition:all 0.5s cubic-bezier(0,.68,.36,1);
+}
+.PhotoCard:hover {
+	background-color: rgba(0,0,0,0.2);
+	background-position:60% 50%;
+}
