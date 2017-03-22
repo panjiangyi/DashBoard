@@ -68,7 +68,7 @@ export default class ShowcaseLayout extends Component {
 
   render() {
     return (
-      <div onClick={this.watchBigImages}>        
+      <div style={{position:'relative'}} onClick={this.watchBigImages}>        
         <ResponsiveReactGridLayout
           {...this.props}
           onBreakpointChange={this.onBreakpointChange}

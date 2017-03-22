@@ -14,8 +14,8 @@ let data = {
 	photoUrls:[
               'http://p1.bqimg.com/588570/3565fef562d6caa1s.jpg',
               'http://p1.bqimg.com/588570/74add1d3828de6f2s.jpg',
-              'http://p1.bqimg.com/588570/74add1d3828de6f2s.jpg',
-              'http://p1.bqimg.com/588570/74add1d3828de6f2s.jpg',
+              'http://i4.buimg.com/588570/6a4353b4fbe5a682t.jpg',
+              'http://i4.buimg.com/588570/1c0a539fb8ac3e88t.jpg',
               'http://p1.bqimg.com/588570/74add1d3828de6f2s.jpg',
               'http://p1.bqimg.com/588570/74add1d3828de6f2s.jpg',
               'http://p1.bqimg.com/588570/74add1d3828de6f2s.jpg',
