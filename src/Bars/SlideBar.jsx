@@ -24,6 +24,7 @@ import {Link} from 'react-router';
         >
           <AppBar showMenuIconButton={false} title="Select"/>
           <MenuItem children={<Link to={'/photo'}>photo</Link>} onTouchTap={this.handleClose} />
+          <MenuItem children={<Link to={'/myDragAble'}>myDragable</Link>} onTouchTap={this.handleClose} />
           <DropOutManu />
         </Drawer>
     );
