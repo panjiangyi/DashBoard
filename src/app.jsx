@@ -12,7 +12,7 @@ injectTapEventPlugin();
 import Photo from './photo/photo.jsx';
 import BigImage from './photo/BigImage.jsx'
 import Gallary from './gallary/Gallary.jsx'
-import myDragable from './myDragable/myDragable.jsx'
+import DragableCon from './myDragable/DragableCon.jsx'
 
  
 class App extends Component{
@@ -43,7 +43,7 @@ render((
 				<Route path="/Photo/img:which" component={BigImage} />
 			</Route>
 			<Route path="/Photo1" component={Gallary}/>
-			<Route path="/myDragAble" component={myDragable}/>
+			<Route path="/myDragAble" component={DragableCon}/>
 		</Route>	
 	</Router>
 ), document.getElementById('app'));
