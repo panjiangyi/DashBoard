@@ -18,4 +18,16 @@ export default class Actions {
 			type: fluxConstants.PHOTO_URL,
 		});
 	}
+	static 	storeGrids(node) {
+		dispatcher.dispatch({
+			type: fluxConstants.STORE_GRIDS,
+			node:node
+		});
+	}	
+	static 	modifyStoredGrids(node) {
+		dispatcher.dispatch({
+			type: fluxConstants.MODIFY_STORED_GRIDS_POS,
+			node:node
+		});
+	}
 }

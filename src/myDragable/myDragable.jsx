@@ -1,4 +1,8 @@
 import React,{Component} from 'react';
+import Store from './../flux/store';
+import action from './../flux/action';
+import fluxConstants from './../flux/constants';
+import judgePostion from './beyondOrBlow'
 let children = [];
 var statusfac = (function(){
 	let gridStates = [];
@@ -14,8 +18,6 @@ var statusfac = (function(){
 
 
 
-
-
 let dragListener = (function(){
 		let lastMouseX=0,lastMouseY=0,
 			oldEleX=0,oldEleY=0,
@@ -27,7 +29,6 @@ let dragListener = (function(){
 					let oldXY = statusfac.getState(index);
 					oldXY?(oldEleX=oldXY.x,oldEleY=oldXY.y):(oldEleX=0,oldEleY=0);
 					target=null;
-					console.log('true')
 				}
 				e.preventDefault();
 				lastTarget = target = this;
@@ -50,24 +51,54 @@ let dragListener = (function(){
 						},
 			dragEnd(e){
 				e.preventDefault();
+				let nodeInfo = getGridCss.call(this)
+				getDragEndGridPos(nodeInfo);
+				storeGrid(nodeInfo);
 				statusfac.save({
 					x:oldEleX,
 					y:oldEleY
 				},index)
 				document.removeEventListener('mousemove',dragListener.dragging)
-				// console.log('Dragging end')
 			}
 		}
 	})()
+function getGridCss(){
+	let ox= +this.style.left.split('px')[0],
+	oy= +this.style.top.split('px')[0],
+	w= +this.style.width.split('px')[0],
+	h= +this.style.height.split('px')[0],
+	d = this.style.transform.split('(')[1].split('px'),
+	transX = +d[0],
+	transY = +d[1].split(' ')[1];
+	return {
+		ele:this,
+		x:ox+transX,
+		y:oy+transY,
+		w:w,
+		h:h
+	}
+}
+function storeGrid(node){
+	action.modifyStoredGrids(node);
+}
+function getDragEndGridPos(node){
+	judgePostion.gridDetermine.call(node.ele,node.x,node.y,node.w,node.h);
+}
  export default class MyDragable extends Component {
 	constructor(props) {
 		super(props);
 		
 	}
 	componentWillMount() {
-
+		this.storeSubscription = Store.addListener(fluxConstants.STORE_GRIDS,() => {
+			// console.log(Store.getState().gridsNode)
+		});
 	}
 	componentDidMount() {
+		// judgePostion.gridDetermine(336,290,400,100);
+	}
+	componentWillUnmount() {
+		this.storeSubscription.remove();
 	}
 	render() {
 		children = []
@@ -85,3 +116,5 @@ let dragListener = (function(){
 		);
 	}
 };
+
+
