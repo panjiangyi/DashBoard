@@ -16,11 +16,35 @@ export default class DragableCon extends Component {
 	render() {
 		return (
 			<MyDragable>
-				<DragDiv index={0} selfStyle={{backgroundColor:'red',left:'100px'/*height:`${Math.random()*300}px`,width:`${Math.random()*300}px`*/}}/>
-				<DragDiv index={1} selfStyle={{backgroundColor:'green',left:'400px',top:'500px'/*height:`${Math.random()*300}px`,width:`${Math.random()*300}px`*/}}/>
-				<DragDiv index={2} selfStyle={{backgroundColor:'green',left:'400px'/*height:`${Math.random()*300}px`,width:`${Math.random()*300}px`*/}}/>
-				<DragDiv index={3} selfStyle={{backgroundColor:'green',left:'400px',top:'800px'/*height:`${Math.random()*300}px`,width:`${Math.random()*300}px`*/}}/>
+				<DragDiv index={uniqueIndex()} selfStyle={{backgroundColor:randomColor()/*height:`${Math.random()*300}px`,width:`${Math.random()*300}px`*/}}/>
+				<DragDiv index={uniqueIndex()} selfStyle={{backgroundColor:randomColor()/*height:`${Math.random()*300}px`,width:`${Math.random()*300}px`*/}}/>
+				<DragDiv index={uniqueIndex()} selfStyle={{backgroundColor:randomColor()/*height:`${Math.random()*300}px`,width:`${Math.random()*300}px`*/}}/>
+				<DragDiv index={uniqueIndex()} selfStyle={{backgroundColor:randomColor()/*height:`${Math.random()*300}px`,width:`${Math.random()*300}px`*/}}/>
+				<DragDiv index={uniqueIndex()} selfStyle={{backgroundColor:randomColor()/*height:`${Math.random()*300}px`,width:`${Math.random()*300}px`*/}}/>
+				<DragDiv index={uniqueIndex()} selfStyle={{backgroundColor:randomColor()/*height:`${Math.random()*300}px`,width:`${Math.random()*300}px`*/}}/>
+				<DragDiv index={uniqueIndex()} selfStyle={{backgroundColor:randomColor()/*height:`${Math.random()*300}px`,width:`${Math.random()*300}px`*/}}/>
+				<DragDiv index={uniqueIndex()} selfStyle={{backgroundColor:randomColor()/*height:`${Math.random()*300}px`,width:`${Math.random()*300}px`*/}}/>
+				<DragDiv index={uniqueIndex()} selfStyle={{backgroundColor:randomColor()/*height:`${Math.random()*300}px`,width:`${Math.random()*300}px`*/}}/>
+				<DragDiv index={uniqueIndex()} selfStyle={{backgroundColor:randomColor()/*height:`${Math.random()*300}px`,width:`${Math.random()*300}px`*/}}/>
+				<DragDiv index={uniqueIndex()} selfStyle={{backgroundColor:randomColor()/*height:`${Math.random()*300}px`,width:`${Math.random()*300}px`*/}}/>
+				<DragDiv index={uniqueIndex()} selfStyle={{backgroundColor:randomColor()/*height:`${Math.random()*300}px`,width:`${Math.random()*300}px`*/}}/>
+				<DragDiv index={uniqueIndex()} selfStyle={{backgroundColor:randomColor()/*height:`${Math.random()*300}px`,width:`${Math.random()*300}px`*/}}/>
+				<DragDiv index={uniqueIndex()} selfStyle={{backgroundColor:randomColor()/*height:`${Math.random()*300}px`,width:`${Math.random()*300}px`*/}}/>
+				<DragDiv index={uniqueIndex()} selfStyle={{backgroundColor:randomColor()/*height:`${Math.random()*300}px`,width:`${Math.random()*300}px`*/}}/>
+				<DragDiv index={uniqueIndex()} selfStyle={{backgroundColor:randomColor()/*height:`${Math.random()*300}px`,width:`${Math.random()*300}px`*/}}/>
+				<DragDiv index={uniqueIndex()} selfStyle={{backgroundColor:randomColor()/*height:`${Math.random()*300}px`,width:`${Math.random()*300}px`*/}}/>
 			</MyDragable>
 		);
 	}
 }
+function randomColor(){
+	let r = Math.random,
+		f = Math.floor;
+	return `rgb(${f(r()*255)},${f(r()*255)},${f(r()*255)})`
+}
+let uniqueIndex = (function(){
+	let i=0
+	return function(){
+		return i++
+	}
+}())

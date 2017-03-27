@@ -2,7 +2,9 @@ import React,{Component} from 'react';
 import Store from './../flux/store';
 import action from './../flux/action';
 import fluxConstants from './../flux/constants';
-import judgePostion from './beyondOrBlow'
+import judgePostion from './beyondOrBlow';
+import map from './map';
+
 let children = [];
 var statusfac = (function(){
 	let gridStates = [];
@@ -62,6 +64,7 @@ let dragListener = (function(){
 			}
 		}
 	})()
+	//计算方块位置和大小
 function getGridCss(){
 	let ox= +this.style.left.split('px')[0],
 	oy= +this.style.top.split('px')[0],
@@ -78,11 +81,27 @@ function getGridCss(){
 		h:h
 	}
 }
+//修改Store中的方块信息
 function storeGrid(node){
 	action.modifyStoredGrids(node);
 }
+//得到拖拽结束后的方块与其他方块的位置关系
 function getDragEndGridPos(node){
 	judgePostion.gridDetermine.call(node.ele,node.x,node.y,node.w,node.h);
+}
+function firstTimeToState(node){
+	let pos = map();
+	node.style.left = '0px';
+	node.style.top = '0px';
+	node.style.transition = 'all 0.5s ease';
+	node.style.transform = `translate(${pos.x}px, ${pos.y}px)`;
+	let newPos = getGridCss.call(node);
+	statusfac.save({
+					x:newPos.x,
+					y:newPos.y
+				},node.getAttribute('data-index'));
+	storeGrid(newPos)
+
 }
  export default class MyDragable extends Component {
 	constructor(props) {
@@ -95,7 +114,12 @@ function getDragEndGridPos(node){
 		});
 	}
 	componentDidMount() {
-		// judgePostion.gridDetermine(336,290,400,100);
+		let grids = Store.getState().gridsNode;
+		setTimeout(()=>{
+		for(let i=0;i<grids.length;i++){
+			firstTimeToState(grids[i].ele);
+		}
+		},0)
 	}
 	componentWillUnmount() {
 		this.storeSubscription.remove();

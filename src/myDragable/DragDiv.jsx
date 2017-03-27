@@ -24,10 +24,17 @@ export default class DragDiv extends Component {
 		Object.assign(this.dragedDivCss,this.props.selfStyle)
 	}
 	componentDidMount() {
-		this.refs.grid.addEventListener('mousedown',this.props.mousedown)
-		this.refs.grid.addEventListener('mouseup',this.props.mouseup);
-
+		let grid = this.refs.grid;
+		grid.addEventListener('mousedown',this.props.mousedown)
+		grid.addEventListener('mouseup',this.props.mouseup);
+		grid.addEventListener("transitionend", this.removeTransition);
 		this.stroeGrid(this.dragedDivCss);
+	}
+ 	removeTransition=()=>{
+		this.refs.grid.style.transition = 'none';
+	}
+	componentWillUnmount() {
+		this.refs.grid.removeEventListener("transitionend", this.removeTransition);
 	}
 	stroeGrid(css){
 		action.storeGrids({
