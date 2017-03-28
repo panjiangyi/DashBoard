@@ -26,7 +26,8 @@ let dragListener = (function(){
 			target=null,lastTarget=null,index=null;
 		return {
 			dragStart(e){
-				index = this.getAttribute('data-index')
+				index = this.getAttribute('data-index');
+				this.style.zIndex = 999;
 				if(lastTarget!==this){
 					let oldXY = statusfac.getState(index);
 					oldXY?(oldEleX=oldXY.x,oldEleY=oldXY.y):(oldEleX=0,oldEleY=0);
@@ -53,17 +54,42 @@ let dragListener = (function(){
 						},
 			dragEnd(e){
 				e.preventDefault();
-				let nodeInfo = getGridCss.call(this)
-				getDragEndGridPos(nodeInfo);
+				//推拽结束后方块位置大小
+				let nodeInfo = getGridCss.call(this);
+				//拖拽托书后方块的归宿
+				let targetPos = targetArea(nodeInfo);
+				//方块归位
+				goHome.call(this,targetPos);
+				//归位后的位置与拖拽结束后的位置合并
+				Object.assign(nodeInfo,targetPos);
+				//修改Store中的方块信息
 				storeGrid(nodeInfo);
-				statusfac.save({
-					x:oldEleX,
-					y:oldEleY
-				},index)
+				//方块归位后，与其他方块的空间关系
+				let relative = getDragEndGridPos(nodeInfo);
+				console.log(relative);
+				//储存下一次拖拽的初始位置
+				statusfac.save(targetPos,index);
+				oldEleX = targetPos.x;
+				oldEleY = targetPos.y;
+				this.style.zIndex = 'auto';
+				//取消拖拽事件侦听
 				document.removeEventListener('mousemove',dragListener.dragging)
 			}
 		}
 	})()
+//回到归宿
+function  goHome(o){
+	this.style.transition = 'all 0.2s ease';
+	this.style.transform = `translate(${o.x}px, ${o.y}px)`
+}
+//计算方块中心点的当前坐标
+function targetArea(n){
+	let barycenter = {
+		x:n.x+n.w/2,
+		y:n.y+n.h/2,
+	}
+	return map.whereToDrop(barycenter);
+}
 	//计算方块位置和大小
 function getGridCss(){
 	let ox= +this.style.left.split('px')[0],
@@ -87,10 +113,10 @@ function storeGrid(node){
 }
 //得到拖拽结束后的方块与其他方块的位置关系
 function getDragEndGridPos(node){
-	judgePostion.gridDetermine.call(node.ele,node.x,node.y,node.w,node.h);
+	return judgePostion.gridDetermine.call(node.ele,node.x,node.y,node.w,node.h);
 }
 function firstTimeToState(node){
-	let pos = map();
+	let pos = map.initPos();
 	node.style.left = '0px';
 	node.style.top = '0px';
 	node.style.transition = 'all 0.5s ease';
