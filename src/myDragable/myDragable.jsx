@@ -26,18 +26,22 @@ let dragListener = (function(){
 			target=null,lastTarget=null,index=null;
 		return {
 			dragStart(e){
+				e.preventDefault();
 				index = this.getAttribute('data-index');
 				this.style.zIndex = 999;
 				if(lastTarget!==this){
 					let oldXY = statusfac.getState(index);
 					oldXY?(oldEleX=oldXY.x,oldEleY=oldXY.y):(oldEleX=0,oldEleY=0);
 					target=null;
-				}
-				e.preventDefault();
+				};
 				lastTarget = target = this;
 				lastMouseX = e.screenX;
 				lastMouseY = e.screenY;
 				document.addEventListener('mousemove',dragListener.dragging)
+				//推拽开始时方块位置大小
+				let nodeInfo = getGridCss.call(this);
+				let relative = getDragEndGridPos(nodeInfo);
+				// console.log('start:',relative);
 			},
 			dragging:function(e){
 							let offsetX = e.screenX;
@@ -66,29 +70,64 @@ let dragListener = (function(){
 				storeGrid(nodeInfo);
 				//方块归位后，与其他方块的空间关系
 				let relative = getDragEndGridPos(nodeInfo);
-				console.log(relative);
+				awayAway(relative)
 				//储存下一次拖拽的初始位置
 				statusfac.save(targetPos,index);
 				oldEleX = targetPos.x;
 				oldEleY = targetPos.y;
-				this.style.zIndex = 'auto';
 				//取消拖拽事件侦听
 				document.removeEventListener('mousemove',dragListener.dragging)
 			}
 		}
 	})()
+	//挤开下方方块
+function awayAway(grids){
+		let belowArr = grids.below;
+		// console.log(belowArr)
+		for(let i=0,below;
+			(below = belowArr[i])!=null;i++){
+			let ele = below.ele;
+			let targetPos = {
+				x:below.x,
+				y:below.y+210
+			};
+			ele.style.transition = 'all 0.2s ease';
+			ele.style.transform =  `translate(${targetPos.x}px, ${targetPos.y}px)`
+			let toSave = {};
+			Object.assign(toSave,below,targetPos);
+			storeGrid(toSave);
+				statusfac.save({
+					x:targetPos.x,
+					y:targetPos.y
+				},ele.getAttribute('data-index'));
+
+		}
+	}
 //回到归宿
 function  goHome(o){
 	this.style.transition = 'all 0.2s ease';
 	this.style.transform = `translate(${o.x}px, ${o.y}px)`
 }
-//计算方块中心点的当前坐标
+//拖拽结束后，方块的归宿
 function targetArea(n){
 	let barycenter = {
 		x:n.x+n.w/2,
 		y:n.y+n.h/2,
 	}
-	return map.whereToDrop(barycenter);
+	let tempHome =  map.whereToDrop(barycenter);
+	Object.assign(n,tempHome)
+	//加入方块到临时home，上方方块
+	let beyondArr = getDragEndGridPos(n).beyond;
+	//计算上方最后一个方块的下边缘Y坐标值
+	let distance = 0;
+	for(let i=0;i<beyondArr.length;i++){
+		let tempBeyond = beyondArr[i],
+			bottomY = tempBeyond.y+tempBeyond.h;
+		distance = bottomY>distance?bottomY:distance;
+		distance+=10;
+	}
+	tempHome.y = distance;
+	return tempHome
 }
 	//计算方块位置和大小
 function getGridCss(){
@@ -129,7 +168,10 @@ function firstTimeToState(node){
 	storeGrid(newPos)
 
 }
- export default class MyDragable extends Component {
+
+
+
+export default class MyDragable extends Component {
 	constructor(props) {
 		super(props);
 		

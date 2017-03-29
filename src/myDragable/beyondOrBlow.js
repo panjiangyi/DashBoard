@@ -59,21 +59,21 @@ export default class Tool {
 			if (isOneCol) {
 				if (corner.LT[1] <= node.y) {
 					// console.log('下方', ele)
-					belowArr.push(ele);
+					belowArr.push(node);
 				} else if (corner.LD[1] >= node.y + node.h) {
 					// console.log('上方', ele)
-					beyondArr.push(ele);
+					beyondArr.push(node);
 				}
 			} else if (oneRow(corner, node)) {
 				if (a === 'right' && b === 'right') {
 					// console.log(a,b)
-					leftArr.push(ele);
+					leftArr.push(node);
 				} else if (a === 'left' && b === 'left') {
-					rightArr.push(ele);
+					rightArr.push(node);
 				}
 			} else {
 				// console.log('没有交集', ele)
-				noCrossArr.push(ele);
+				noCrossArr.push(node);
 			}
 		}
 		return {

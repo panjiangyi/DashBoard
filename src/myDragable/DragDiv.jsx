@@ -31,7 +31,9 @@ export default class DragDiv extends Component {
 		this.stroeGrid(this.dragedDivCss);
 	}
  	removeTransition=()=>{
-		this.refs.grid.style.transition = 'none';
+ 		let target = this.refs.grid;
+		target.style.transition = 'none';
+		target.style.zIndex = 'auto';
 	}
 	componentWillUnmount() {
 		this.refs.grid.removeEventListener("transitionend", this.removeTransition);
