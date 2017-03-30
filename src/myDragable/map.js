@@ -12,7 +12,7 @@
  			}
  			return {
  				x: 10 * (rowIndex + 1) + width * rowIndex++,
- 				y: h * colIndex + 10 * colIndex
+ 				y: h * colIndex + 10 * (colIndex+1)
  			}
  		}
  		static whereToDrop(pos){
@@ -21,7 +21,7 @@
  				y = floor(pos.y/h);
  				return {
  					x:x*width+10*(x+1),
- 					y:y*width+10*y
+ 					y:y*width+10*(y+1)
  				}
  		}
  	}
