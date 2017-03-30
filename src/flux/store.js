@@ -23,7 +23,7 @@ let data = {
 		'http://p1.bqimg.com/588570/74add1d3828de6f2s.jpg',
 	],
 	gridsNode:[],
-};
+}; 
 let appStore = {
 	getState() {
 		return data;
