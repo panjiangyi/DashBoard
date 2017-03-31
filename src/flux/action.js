@@ -30,4 +30,11 @@ export default class Actions {
 			node:node
 		});
 	}
+	static 	StoreRels(rels,index) {
+		dispatcher.dispatch({
+			type: fluxConstants.STORE_RELATIVE,
+			rels:rels,
+			i:index
+		});
+	}
 }

@@ -5,8 +5,9 @@ import Store from './../flux/store';
 import action from './../flux/action';
 import fluxConstants from './../flux/constants';
 import judgePostion from './beyondOrBlow';
-import map from './map';
-
+import initMap from './initMap';
+import Tools from './Tools'
+import {addListener,trigger} from './event'
 let children = [];
 var statusfac = (function() {
 	let gridStates = [];
@@ -19,8 +20,6 @@ var statusfac = (function() {
 		},
 	}
 })()
-
-
 
 let dragListener = (function() {
 	let lastMouseX = 0,
@@ -46,9 +45,10 @@ let dragListener = (function() {
 			document.addEventListener('mousemove', dragListener.dragging)
 				//推拽开始时方块位置大小
 			let nodeInfo = getGridCss.call(this);
-			let relative = getDragEndGridPos(nodeInfo);
+			trigger()
 			// console.log('start:',relative);
-			awayAwayComeCome(relative.below,-210);
+			let relative = Tools.getAllRel(nodeInfo,'below')
+			awayAwayComeCome.call(this,relative,-210);
 		},
 		dragging: function(e) {
 			e.preventDefault();
@@ -76,15 +76,17 @@ let dragListener = (function() {
 			//归位后的位置与拖拽结束后的位置合并
 			Object.assign(nodeInfo, targetPos);
 			//方块归位后，与其他方块的空间关系
-			let relative = getDragEndGridPos(nodeInfo);
+			// let relative = getDragEndGridPos(nodeInfo);
+			let relative = Tools.getAllRel(nodeInfo,'below')
 			// console.log('end:',relative);
-			awayAwayComeCome(relative.below,210)
+			awayAwayComeCome.call(this,relative,210)
 			//修改Store和statusfac中的方块信息
 			saveGridState(nodeInfo)
 			oldEleX = targetPos.x;
 			oldEleY = targetPos.y;
 			//取消拖拽事件侦听
 			document.removeEventListener('mousemove', dragListener.dragging)
+			
 		}
 	}
 })()
@@ -99,18 +101,21 @@ function saveGridState(nodeInfo) {
 //挤开下方方块
 function awayAwayComeCome(grids,dis) {
 	let lastGrid;
-	for (let i = 0, grid;
-		(grid = grids[i]) != null; i++) {
-		let ele = grid.ele;
+	for (let i = 0, ele;
+		(ele = grids[i]) != null; i++) {
+		if(ele === this){continue}
+		let pos = getGridCss.call(ele);
+		// if(dis < -0){
+		// 	dis = targetArea(pos).y - pos.y
+		// }
 		let targetPos = {
-				x: grid.x,
-				y: grid.y + dis
+				x: pos.x,
+				y: pos.y + dis
 			};
 		ele.style.transition = 'all 0.2s ease';
 		ele.style.transform = `translate(${targetPos.x}px, ${targetPos.y}px)`
-		Object.assign(grid, targetPos);
-		saveGridState(grid)
-
+		Object.assign(pos, targetPos);
+		saveGridState(pos)
 	}
 }
 //回到归宿
@@ -124,15 +129,18 @@ function targetArea(n) {
 		x: n.x + n.w / 2,
 		y: n.y + n.h / 2,
 	}
-	let tempHome = map.whereToDrop(barycenter);
-	Object.assign(n, tempHome)
+	let tempHome = initMap.whereToDrop(barycenter);
+	let newN = {}
+	Object.assign(newN,n, tempHome)
 		//加入方块到临时home，上方方块
-	let beyondArr = getDragEndGridPos(n).beyond;
+	// let beyondArr = getDragEndGridPos(n).beyond;
+	let beyondArr = Tools.getAllRel(newN,'beyond')
 	//计算上方最后一个方块的下边缘Y坐标值
 	let distance = 0;
 	for (let i = 0; i < beyondArr.length; i++) {
-		let tempBeyond = beyondArr[i],
-			bottomY = tempBeyond.y + tempBeyond.h;
+		let ele = beyondArr[i];
+		let pos = getGridCss.call(ele);
+		let	bottomY = pos.y + pos.h;
 		distance = bottomY > distance ? bottomY : distance;
 	}
 	distance += 10;
@@ -167,7 +175,7 @@ function getDragEndGridPos(node) {
 }
 
 function firstTimeToState(node) {
-	let pos = map.initPos();
+	let pos = initMap.initPos();
 	node.style.left = '0px';
 	node.style.top = '0px';
 	node.style.transition = 'all 0.5s ease';

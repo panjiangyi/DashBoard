@@ -1,7 +1,7 @@
 import React,{Component} from 'react';
 import action from '../flux/action'
-
-
+import Tools from './Tools'
+import {addListener} from './event'
 
 export default class DragDiv extends Component {
 	constructor(props) {
@@ -27,8 +27,22 @@ export default class DragDiv extends Component {
 		let grid = this.refs.grid;
 		grid.addEventListener('mousedown',this.props.mousedown)
 		grid.addEventListener('mouseup',this.props.mouseup);
+		// grid.addEventListener('mouseup',()=>{
+		// 	setTimeout(this.removeTransition,500)
+		// });
 		grid.addEventListener("transitionend", this.removeTransition);
+		addListener(this.getRel)
 		this.stroeGrid(this.dragedDivCss);
+	}
+	getRel=()=>{
+		let target = this.refs.grid;
+ 		let nodeInfo = Tools.getGridCss.call(target)
+ 		let rels = Tools.gridRels(nodeInfo);
+ 		let upDn = {
+ 			beyond:rels.beyond,
+ 			below:rels.below,
+ 		}
+ 		action.StoreRels(upDn,this.props.index);
 	}
  	removeTransition=()=>{
  		let target = this.refs.grid;
