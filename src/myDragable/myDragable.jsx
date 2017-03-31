@@ -48,7 +48,7 @@ let dragListener = (function() {
 			trigger()
 			// console.log('start:',relative);
 			let relative = Tools.getAllRel(nodeInfo,'below')
-			awayAwayComeCome.call(this,relative,-210);
+			awayAwayComeCome.call(this,relative,-210,nodeInfo.ele);
 		},
 		dragging: function(e) {
 			e.preventDefault();
@@ -79,7 +79,9 @@ let dragListener = (function() {
 			// let relative = getDragEndGridPos(nodeInfo);
 			let relative = Tools.getAllRel(nodeInfo,'below')
 			// console.log('end:',relative);
-			awayAwayComeCome.call(this,relative,210)
+			if(!hasSeat(nodeInfo)){
+				awayAwayComeCome.call(this,relative,210)
+			}
 			//修改Store和statusfac中的方块信息
 			saveGridState(nodeInfo)
 			oldEleX = targetPos.x;
@@ -99,15 +101,21 @@ function saveGridState(nodeInfo) {
 	}, nodeInfo.ele.getAttribute('data-index'));
 }
 //挤开下方方块
-function awayAwayComeCome(grids,dis) {
+function awayAwayComeCome(grids,dis,causeNode) {
 	let lastGrid;
+	grids.sort((a,b)=>{
+		return getGridCss.call(a).y - getGridCss.call(b).y;
+	})
 	for (let i = 0, ele;
 		(ele = grids[i]) != null; i++) {
 		if(ele === this){continue}
 		let pos = getGridCss.call(ele);
-		// if(dis < -0){
+		if(dis < -0){
 		// 	dis = targetArea(pos).y - pos.y
-		// }
+		// console.log(ele.getAttribute('data-index'),stem(pos,causeNode))
+		let isStatic = stem(pos,causeNode);
+		if(isStatic===0){break}
+		}
 		let targetPos = {
 				x: pos.x,
 				y: pos.y + dis
@@ -146,6 +154,30 @@ function targetArea(n) {
 	distance += 10;
 	tempHome.y = distance;
 	return tempHome
+}
+//有位置
+function hasSeat(node){
+	let belowArr =  judgePostion.gridDetermine.call(node.ele, node.x, node.y, node.w, node.h).below;
+	let bl = true;
+	for(let i=0;i<belowArr.length;i++){
+		if(belowArr[i].y===node.y){
+			bl = false
+			break
+		}
+	}
+	return bl
+}
+//计算上方是否有阻挡
+function stem(node,causeNode){
+	let beyondArr =  judgePostion.gridDetermine.call(node.ele, node.x, node.y, node.w, node.h).beyond;
+	let distance = 0;
+	for (let i = 0; i < beyondArr.length; i++) {
+		let pos = beyondArr[i];
+		if(pos.ele === causeNode){continue}
+		let	bottomY = pos.y + pos.h;
+		distance = bottomY > distance ? bottomY : distance;
+	}
+	return node.y - distance -10
 }
 //计算方块位置和大小
 function getGridCss() {
