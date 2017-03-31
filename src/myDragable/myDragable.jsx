@@ -166,7 +166,7 @@ function hasSeat(node){
 		}
 	}
 	return bl
-}
+} 
 //计算上方是否有阻挡
 function stem(node,causeNode){
 	let beyondArr =  judgePostion.gridDetermine.call(node.ele, node.x, node.y, node.w, node.h).beyond;
