@@ -7,9 +7,9 @@ import fluxConstants from './../flux/constants';
 import judgePostion from './beyondOrBlow';
 import initMap from './initMap';
 import Tools from './Tools'
-import {addListener,trigger} from './event'
+import { addListener, trigger } from './event'
 let children = [];
-var statusfac = (function() {
+var statusfac = (function () {
 	let gridStates = [];
 	return {
 		save(o, i) {
@@ -21,7 +21,7 @@ var statusfac = (function() {
 	}
 })()
 
-let dragListener = (function() {
+let dragListener = (function () {
 	let lastMouseX = 0,
 		lastMouseY = 0,
 		oldEleX = 0,
@@ -43,14 +43,14 @@ let dragListener = (function() {
 			lastMouseX = e.pageX;
 			lastMouseY = e.pageY;
 			document.addEventListener('mousemove', dragListener.dragging)
-				//推拽开始时方块位置大小
+			//推拽开始时方块位置大小
 			let nodeInfo = getGridCss.call(this);
 			trigger()
+			let relative = Tools.getAllRel(nodeInfo, 'below')
 			// console.log('start:',relative);
-			let relative = Tools.getAllRel(nodeInfo,'below')
-			awayAwayComeCome.call(this,relative,-210,nodeInfo.ele);
+			awayAwayComeCome.call(this, relative, -210, nodeInfo.ele);
 		},
-		dragging: function(e) {
+		dragging: function (e) {
 			e.preventDefault();
 			let offsetX = e.pageX;
 			let offsetY = e.pageY;
@@ -77,10 +77,10 @@ let dragListener = (function() {
 			Object.assign(nodeInfo, targetPos);
 			//方块归位后，与其他方块的空间关系
 			// let relative = getDragEndGridPos(nodeInfo);
-			let relative = Tools.getAllRel(nodeInfo,'below')
+			let relative = Tools.getAllRel(nodeInfo, 'below')
 			// console.log('end:',relative);
-			if(!hasSeat(nodeInfo)){
-				awayAwayComeCome.call(this,relative,210)
+			if (!hasSeat(nodeInfo)) {
+				awayAwayComeCome.call(this, relative, 210)
 			}
 			//修改Store和statusfac中的方块信息
 			saveGridState(nodeInfo)
@@ -88,7 +88,7 @@ let dragListener = (function() {
 			oldEleY = targetPos.y;
 			//取消拖拽事件侦听
 			document.removeEventListener('mousemove', dragListener.dragging)
-			
+
 		}
 	}
 })()
@@ -101,25 +101,31 @@ function saveGridState(nodeInfo) {
 	}, nodeInfo.ele.getAttribute('data-index'));
 }
 //挤开下方方块
-function awayAwayComeCome(grids,dis,causeNode) {
+function awayAwayComeCome(grids, dis, causeNode) {
 	let lastGrid;
-	grids.sort((a,b)=>{
+	grids.sort((a, b) => {
 		return getGridCss.call(a).y - getGridCss.call(b).y;
 	})
+	let lastLoopEle;
 	for (let i = 0, ele;
 		(ele = grids[i]) != null; i++) {
-		if(ele === this){continue}
+		if (ele === this) { continue }
 		let pos = getGridCss.call(ele);
-		if(dis < -0){
-		// 	dis = targetArea(pos).y - pos.y
-		// console.log(ele.getAttribute('data-index'),stem(pos,causeNode))
-		let isStatic = stem(pos,causeNode);
-		if(isStatic===0){break}
+		if (dis < -0) {
+			let isStatic = stem(pos, causeNode);
+			if (isStatic === 0) { break }
+		} else if (dis >= 0) {
+			//计算当前方块与上方的距离,dis减去距离等于此方块要移动的距离,dis不能小于零
+			lastLoopEle&&(dis = dis - (pos.y - lastLoopEle.y));
+			if(dis<0){
+				dis=0;
+			}
+			lastLoopEle = pos;
 		}
 		let targetPos = {
-				x: pos.x,
-				y: pos.y + dis
-			};
+			x: pos.x,
+			y: pos.y + dis
+		};
 		ele.style.transition = 'all 0.2s ease';
 		ele.style.transform = `translate(${targetPos.x}px, ${targetPos.y}px)`
 		Object.assign(pos, targetPos);
@@ -139,16 +145,16 @@ function targetArea(n) {
 	}
 	let tempHome = initMap.whereToDrop(barycenter);
 	let newN = {}
-	Object.assign(newN,n, tempHome)
-		//加入方块到临时home，上方方块
+	Object.assign(newN, n, tempHome)
+	//加入方块到临时home，上方方块
 	// let beyondArr = getDragEndGridPos(n).beyond;
-	let beyondArr = Tools.getAllRel(newN,'beyond')
+	let beyondArr = Tools.getAllRel(newN, 'beyond')
 	//计算上方最后一个方块的下边缘Y坐标值
 	let distance = 0;
 	for (let i = 0; i < beyondArr.length; i++) {
 		let ele = beyondArr[i];
 		let pos = getGridCss.call(ele);
-		let	bottomY = pos.y + pos.h;
+		let bottomY = pos.y + pos.h;
 		distance = bottomY > distance ? bottomY : distance;
 	}
 	distance += 10;
@@ -156,28 +162,30 @@ function targetArea(n) {
 	return tempHome
 }
 //有位置
-function hasSeat(node){
-	let belowArr =  judgePostion.gridDetermine.call(node.ele, node.x, node.y, node.w, node.h).below;
+function hasSeat(node) {
+	let belowArr = judgePostion.gridDetermine.call(node.ele, node.x, node.y, node.w, node.h).below;
 	let bl = true;
-	for(let i=0;i<belowArr.length;i++){
-		if(belowArr[i].y===node.y){
+	// console.log(node)
+	for (let i = 0; i < belowArr.length; i++) {
+		if (belowArr[i].y === node.y) {
 			bl = false
 			break
 		}
 	}
 	return bl
-} 
+}
 //计算上方是否有阻挡
-function stem(node,causeNode){
-	let beyondArr =  judgePostion.gridDetermine.call(node.ele, node.x, node.y, node.w, node.h).beyond;
+function stem(node, causeNode) {
+	// console.log(node,causeNode)
+	let beyondArr = judgePostion.gridDetermine.call(node.ele, node.x, node.y, node.w, node.h).beyond;
 	let distance = 0;
 	for (let i = 0; i < beyondArr.length; i++) {
 		let pos = beyondArr[i];
-		if(pos.ele === causeNode){continue}
-		let	bottomY = pos.y + pos.h;
+		if (pos.ele === causeNode) { continue }
+		let bottomY = pos.y + pos.h;
 		distance = bottomY > distance ? bottomY : distance;
 	}
-	return node.y - distance -10
+	return node.y - distance - 10
 }
 //计算方块位置和大小
 function getGridCss() {
@@ -202,7 +210,7 @@ function storeGrid(node) {
 }
 //得到拖拽结束后的方块与其他方块的位置关系
 function getDragEndGridPos(node) {
-	let originRel =  judgePostion.gridDetermine.call(node.ele, node.x, node.y, node.w, node.h);
+	let originRel = judgePostion.gridDetermine.call(node.ele, node.x, node.y, node.w, node.h);
 	return originRel
 }
 
@@ -223,36 +231,36 @@ function firstTimeToState(node) {
 export default class MyDragable extends Component {
 	constructor(props) {
 		super(props);
-		
+
 	}
 	componentWillMount() {
-		this.storeSubscription = Store.addListener(fluxConstants.STORE_GRIDS,() => {
+		this.storeSubscription = Store.addListener(fluxConstants.STORE_GRIDS, () => {
 			// console.log(Store.getState().gridsNode)
 		});
 	}
 	componentDidMount() {
 		let grids = Store.getState().gridsNode;
-		setTimeout(()=>{
-		for(let i=0;i<grids.length;i++){
-			firstTimeToState(grids[i].ele);
-		}
-		},0)
+		setTimeout(() => {
+			for (let i = 0; i < grids.length; i++) {
+				firstTimeToState(grids[i].ele);
+			}
+		}, 0)
 	}
 	componentWillUnmount() {
 		this.storeSubscription.remove();
 	}
 	render() {
 		children = []
-		this.props.children.forEach(function(ele,i){
+		this.props.children.forEach(function (ele, i) {
 			children.push(React.cloneElement(ele, {
-							            mousedown:dragListener.dragStart,
-							            mouseup:dragListener.dragEnd,
-							            key:i
-							          }))
+				mousedown: dragListener.dragStart,
+				mouseup: dragListener.dragEnd,
+				key: i
+			}))
 		})
 		return (
-			<div  ref='container' style={{position:'relative',backgroundColor:'red',touchAction:'none'}}>
-			{children}
+			<div ref='container' style={{ position: 'relative', backgroundColor: 'red', touchAction: 'none' }}>
+				{children}
 			</div>
 		);
 	}
