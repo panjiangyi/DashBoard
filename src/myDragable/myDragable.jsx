@@ -72,7 +72,7 @@ let dragListener = (function () {
 			//拖拽托书后方块的归宿
 			let targetPos = targetArea(nodeInfo);
 			//方块归位
-			goHome.call(this, targetPos);
+			goHome.call(this,nodeInfo, targetPos);
 			//归位后的位置与拖拽结束后的位置合并
 			Object.assign(nodeInfo, targetPos);
 			//方块归位后，与其他方块的空间关系
@@ -116,9 +116,9 @@ function awayAwayComeCome(grids, dis, causeNode) {
 			if (isStatic === 0) { break }
 		} else if (dis >= 0) {
 			//计算当前方块与上方的距离,dis减去距离等于此方块要移动的距离,dis不能小于零
-			lastLoopEle&&(dis = dis - (pos.y - lastLoopEle.y));
-			if(dis<0){
-				dis=0;
+			lastLoopEle && (dis = dis - (pos.y - lastLoopEle.y));
+			if (dis < 0) {
+				dis = 0;
 			}
 			lastLoopEle = pos;
 		}
@@ -126,16 +126,19 @@ function awayAwayComeCome(grids, dis, causeNode) {
 			x: pos.x,
 			y: pos.y + dis
 		};
-		ele.style.transition = 'all 0.2s ease';
-		ele.style.transform = `translate(${targetPos.x}px, ${targetPos.y}px)`
+			ele.style.transform = `translate(${targetPos.x}px, ${targetPos.y}px)`
+			ele.style.transition = 'all 0.2s ease';
 		Object.assign(pos, targetPos);
 		saveGridState(pos)
 	}
 }
 //回到归宿
-function goHome(o) {
+function goHome(originPos,targetPos) {
+	if(originPos.y===targetPos.y){
+		return
+	}
 	this.style.transition = 'all 0.2s ease';
-	this.style.transform = `translate(${o.x}px, ${o.y}px)`
+	this.style.transform = `translate(${targetPos.x}px, ${targetPos.y}px)`
 }
 //拖拽结束后，方块的归宿
 function targetArea(n) {
