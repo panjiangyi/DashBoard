@@ -6,8 +6,8 @@ import action from './../flux/action';
 import fluxConstants from './../flux/constants';
 import judgePostion from './beyondOrBlow';
 import initMap from './initMap';
-import Tools from './Tools'
-import { addListener, trigger } from './event'
+import Tools from './Tools';
+import { addListener, trigger } from './event';
 let children = [];
 var statusfac = (function () {
 	let gridStates = [];
@@ -20,7 +20,6 @@ var statusfac = (function () {
 		},
 	}
 })()
-
 let dragListener = (function () {
 	let lastMouseX = 0,
 		lastMouseY = 0,
@@ -47,14 +46,13 @@ let dragListener = (function () {
 			let nodeInfo = getGridCss.call(this);
 			trigger()
 			let relative = Tools.getAllRel(nodeInfo, 'below')
-			// console.log('start:',relative);
 			awayAwayComeCome.call(this, relative, -210, nodeInfo.ele);
+			saveGridState(nodeInfo)
 		},
 		dragging: function (e) {
 			e.preventDefault();
 			let offsetX = e.pageX;
 			let offsetY = e.pageY;
-			// console.log(offsetX,offsetY)
 			let moveX = offsetX - lastMouseX;
 			let moveY = offsetY - lastMouseY;
 			let newEleX = oldEleX + moveX;
@@ -72,11 +70,12 @@ let dragListener = (function () {
 			//拖拽托书后方块的归宿
 			let targetPos = targetArea(nodeInfo);
 			//方块归位
-			goHome.call(this,nodeInfo, targetPos);
+			// console.log(targetPos)
+			goHome.call(this, nodeInfo, targetPos);
 			//归位后的位置与拖拽结束后的位置合并
 			Object.assign(nodeInfo, targetPos);
 			//方块归位后，与其他方块的空间关系
-			// let relative = getDragEndGridPos(nodeInfo);
+			// console.log(nodeInfo)
 			let relative = Tools.getAllRel(nodeInfo, 'below')
 			// console.log('end:',relative);
 			if (!hasSeat(nodeInfo)) {
@@ -102,7 +101,7 @@ function saveGridState(nodeInfo) {
 }
 //挤开下方方块
 function awayAwayComeCome(grids, dis, causeNode) {
-	let lastGrid;
+	let lastGrid, oriDis = dis;
 	grids.sort((a, b) => {
 		return getGridCss.call(a).y - getGridCss.call(b).y;
 	})
@@ -117,24 +116,28 @@ function awayAwayComeCome(grids, dis, causeNode) {
 		} else if (dis >= 0) {
 			//计算当前方块与上方的距离,dis减去距离等于此方块要移动的距离,dis不能小于零
 			lastLoopEle && (dis = dis - (pos.y - lastLoopEle.y));
+			lastLoopEle &&console.log(lastLoopEle,pos.y - lastLoopEle.y)
 			if (dis < 0) {
 				dis = 0;
 			}
-			lastLoopEle = pos;
+			if (dis > oriDis) {
+				dis = oriDis;
+			}
 		}
 		let targetPos = {
 			x: pos.x,
 			y: pos.y + dis
 		};
-			ele.style.transform = `translate(${targetPos.x}px, ${targetPos.y}px)`
-			ele.style.transition = 'all 0.2s ease';
+		ele.style.transform = `translate(${targetPos.x}px, ${targetPos.y}px)`
+		ele.style.transition = 'all 0.2s ease';
 		Object.assign(pos, targetPos);
 		saveGridState(pos)
+		lastLoopEle = pos;
 	}
 }
 //回到归宿
-function goHome(originPos,targetPos) {
-	if(originPos.y===targetPos.y){
+function goHome(originPos, targetPos) {
+	if (originPos.y === targetPos.y) {
 		return
 	}
 	this.style.transition = 'all 0.2s ease';
@@ -142,11 +145,11 @@ function goHome(originPos,targetPos) {
 }
 //拖拽结束后，方块的归宿
 function targetArea(n) {
-	let barycenter = {
-		x: n.x + n.w / 2,
-		y: n.y + n.h / 2,
-	}
-	let tempHome = initMap.whereToDrop(barycenter);
+	// let barycenter = {
+	// 	   x: n.x + n.w / 2,
+	// 	   y: n.y + n.h / 2,
+	// }
+	let tempHome = initMap.whereToDrop(n);
 	let newN = {}
 	Object.assign(newN, n, tempHome)
 	//加入方块到临时home，上方方块
