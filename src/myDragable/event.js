@@ -8,4 +8,4 @@ function addListener(callback) {
 function trigger() {
 	event.emit('getyourselfgrid');
 };
-export { addListener, trigger } 
+export { addListener, trigger }  
