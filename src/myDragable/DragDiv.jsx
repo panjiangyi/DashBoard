@@ -1,8 +1,7 @@
 import React, { Component } from 'react';
 import action from '../flux/action'
-import Tools from './Tools'
-import { addListener } from './event'
-
+import Tools from './Tools';
+import {addListener} from './event';
 export default class DragDiv extends Component {
 	constructor(props) {
 		super(props);
@@ -31,18 +30,18 @@ export default class DragDiv extends Component {
 		// 	setTimeout(this.removeTransition,500)
 		// });
 		grid.addEventListener("transitionend", this.removeTransition);
-		addListener(this.getRel)
 		this.stroeGrid(this.dragedDivCss);
+		addListener(this.move,this.props.index)
 	}
-	getRel = () => {
-		let target = this.refs.grid;
-		let nodeInfo = Tools.getGridCss.call(target)
-		let rels = Tools.gridRels(nodeInfo);
-		let upDn = {
-			beyond: rels.beyond,
-			below: rels.below,
-		}
-		action.StoreRels(upDn, this.props.index);
+    move=(node)=>{
+		let nodeinfo = Tools.getGridCss.call(this.refs.grid)
+     let beyondRels = Tools.getAllRel(nodeinfo,'beyond');
+	 console.log(this.props.index)
+	 beyondRels.forEach((d,i)=>{
+		 if(d===node){
+			 beyondRels[i]=document.getElementById('agent')
+		 }
+	 })
 	}
 	removeTransition = () => {
 		let target = this.refs.grid;

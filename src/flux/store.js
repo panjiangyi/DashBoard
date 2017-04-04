@@ -23,7 +23,6 @@ let data = {
 		'http://p1.bqimg.com/588570/74add1d3828de6f2s.jpg',
 	],
 	gridsNode:[],
-	rels:[],
 }; 
 let appStore = {
 	getState() {
@@ -63,10 +62,7 @@ dispatcher.register((action) => {
 			}
 			__emitter.emit(fluxConstants.MODIFY_STORED_GRIDS_POS);
 			break;
-		case fluxConstants.STORE_RELATIVE:
-			data.rels[action.i] = action.rels;
-			__emitter.emit(fluxConstants.STORE_RELATIVE);
-			break;
+
 	}
 });
 export default appStore;

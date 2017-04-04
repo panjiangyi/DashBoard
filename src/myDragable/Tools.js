@@ -27,14 +27,6 @@ export default class Tools {
 			dirRel.forEach(d=>{
 				relSet.add(d.ele)
 			})
-		for(let i=0;i<dirRel.length;i++){
-			let ele = dirRel[i].ele
-			let index = ele.getAttribute('data-index');
-			let rel =  Store.getState().rels[index][dir];
-			rel.forEach(d=>{
-				relSet.add(d.ele)
-			})
-		}
 		return [...relSet]
 	}
 }
