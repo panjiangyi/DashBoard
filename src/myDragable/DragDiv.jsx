@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
-import action from '../flux/action'
+import action from '../flux/action';
 import Tools from './Tools';
-import {addListener} from './event';
+import { addListener } from './event';
 export default class DragDiv extends Component {
 	constructor(props) {
 		super(props);
@@ -31,17 +31,25 @@ export default class DragDiv extends Component {
 		// });
 		grid.addEventListener("transitionend", this.removeTransition);
 		this.stroeGrid(this.dragedDivCss);
-		addListener(this.move,this.props.index)
+		addListener(this.move, this.props.index)
 	}
-    move=(node)=>{
-		let nodeinfo = Tools.getGridCss.call(this.refs.grid)
-     let beyondRels = Tools.getAllRel(nodeinfo,'beyond');
-	 console.log(this.props.index)
-	 beyondRels.forEach((d,i)=>{
-		 if(d===node){
-			 beyondRels[i]=document.getElementById('agent')
-		 }
-	 })
+	move = () => {
+		let grid = this.refs.grid;
+		let nodeinfo = Tools.getGridCss.call(grid)
+		let beyondRels = Tools.getAllRel(nodeinfo, 'beyond');
+		// console.log(`${this.props.index}:`, beyondRels)
+		let dis = 0;
+		for (let i = 0; i < beyondRels.length; i++) {
+			let nodeinfo = Tools.getGridCss.call(beyondRels[i]);
+			let nodeBottom = nodeinfo.y + nodeinfo.h
+			dis = dis > nodeBottom ? dis : nodeBottom;
+		}
+		Object.assign(nodeinfo,{
+			y:dis+10
+		})
+		grid.style.transition = 'all 0.5s ease';
+		grid.style.transform = `translate(${nodeinfo.x}px, ${dis+10}px)`;
+		action.modifyStoredGrids(nodeinfo);
 	}
 	removeTransition = () => {
 		let target = this.refs.grid;

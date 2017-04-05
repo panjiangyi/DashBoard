@@ -2,12 +2,14 @@ import React, {
 	Component
 } from 'react';
 import Store from './../flux/store';
+import dragStore from './../flux/dragStore';
 import action from './../flux/action';
 import fluxConstants from './../flux/constants';
 import judgePostion from './beyondOrBlow';
 import initMap from './initMap';
 import Tools from './Tools';
 import agentFac from './agentFac';
+
 let children = [];
 let agent = null;
 var statusfac = (function () {
@@ -46,7 +48,7 @@ let dragListener = (function () {
 			document.addEventListener('mousemove', dragListener.dragging)
 			//推拽开始时方块位置大小
 			let nodeInfo = Tools.getGridCss.call(this);
-            agentFac.start.call(agent,nodeInfo);
+			agentFac.start.call(agent, nodeInfo);
 			let relative = Tools.getAllRel(nodeInfo, 'below')
 			saveGridState(nodeInfo)
 		},
@@ -59,7 +61,7 @@ let dragListener = (function () {
 			let newEleX = oldEleX + moveX;
 			let newEleY = oldEleY + moveY;
 			target.style.transform = `translate(${newEleX}px, ${newEleY}px)`;
-			agentFac.dragging.call(target,newEleX,newEleY);
+			agentFac.dragging.call(target, newEleX, newEleY);
 			oldEleX = newEleX;
 			oldEleY = newEleY;
 			lastMouseX = offsetX;
@@ -71,7 +73,7 @@ let dragListener = (function () {
 			let nodeInfo = Tools.getGridCss.call(this);
 			//拖拽托书后方块的归宿
 			// let targetPos = targetArea(nodeInfo);
-			let targetPos = agentFac.end();
+			let targetPos = agentFac.end(this);
 			//方块归位
 			// console.log(targetPos)
 			goHome.call(this, nodeInfo, targetPos);
@@ -93,7 +95,8 @@ let dragListener = (function () {
 })()
 
 function saveGridState(nodeInfo) {
-	storeGrid(nodeInfo);
+	//修改Store中的方块信息
+	action.modifyStoredGrids(nodeInfo);
 	statusfac.save({
 		x: nodeInfo.x,
 		y: nodeInfo.y
@@ -129,11 +132,6 @@ function targetArea(n) {
 }
 
 
-//修改Store中的方块信息
-function storeGrid(node) {
-	action.modifyStoredGrids(node);
-}
-
 function firstTimeToState(node) {
 	let pos = initMap.initPos();
 	node.style.left = '0px';
@@ -158,12 +156,16 @@ export default class MyDragable extends Component {
 	}
 	componentDidMount() {
 		let grids = Store.getState().gridsNode;
+		agent = this.refs.agent;
 		setTimeout(() => {
 			for (let i = 0; i < grids.length; i++) {
+				let ele = grids[i].ele;
+				if(ele===agent){
+					continue
+				}
 				firstTimeToState(grids[i].ele);
 			}
 		}, 0)
-		agent = this.refs.agent;
 	}
 	componentWillUnmount() {
 		this.storeSubscription.remove();
@@ -179,7 +181,7 @@ export default class MyDragable extends Component {
 		})
 		return (
 			<div ref='container' style={{ position: 'relative', backgroundColor: 'red', touchAction: 'none' }}>
-				<div id='agent' ref='agent' style={{ display:'none',height: '100px', width: '100px', backgroundColor: 'rgba(255,255,0,0.5)', position: 'absolute', left: '0px', right: '0px', zIndex: '998' }}> </div>
+				<div id='agent' ref='agent' style={{ display: 'none', height: '100px', width: '100px', backgroundColor: 'rgba(255,255,0,0.5)', position: 'absolute', left: '0px', right: '0px', zIndex: '998' }}> </div>
 				{children}
 			</div>
 		);

@@ -30,5 +30,10 @@ export default class Actions {
 			node:node
 		});
 	}
-
+	static 	saveGridStates(o,i) {
+		dispatcher.dispatch({
+			type: fluxConstants.SAVE_DRAG_POS,
+			node:node
+		});
+	}
 }

@@ -5,4 +5,5 @@ export default {
 	STORE_GRIDS:'store grids',
 	MODIFY_STORED_GRIDS_POS:'modify stored_ rids pos',
 	STORE_RELATIVE:'store the relatives',
+	SAVE_DRAG_POS:'SAVE_DRAG_POS',
 };
