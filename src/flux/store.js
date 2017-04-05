@@ -22,8 +22,9 @@ let data = {
 		'http://p1.bqimg.com/588570/74add1d3828de6f2s.jpg',
 		'http://p1.bqimg.com/588570/74add1d3828de6f2s.jpg',
 	],
-	gridsNode:[],
-}; 
+	gridsNode: [],
+	rels: [],
+};
 let appStore = {
 	getState() {
 		return data;
@@ -52,17 +53,20 @@ dispatcher.register((action) => {
 			break;
 		case fluxConstants.MODIFY_STORED_GRIDS_POS:
 			let node = action.node;
-			for(var i=0,temp=data.gridsNode[i];temp!=null;i++){
+			for (var i = 0, temp = data.gridsNode[i]; temp != null; i++) {
 				let storedEle = data.gridsNode[i].ele,
 					newEle = node.ele;
-					if(storedEle===newEle){
-						data.gridsNode[i] = node;
-						break
-					}
+				if (storedEle === newEle) {
+					data.gridsNode[i] = node;
+					break
+				}
 			}
 			__emitter.emit(fluxConstants.MODIFY_STORED_GRIDS_POS);
 			break;
-
+		case fluxConstants.STORE_RELATIVE:
+			data.rels[action.i] = action.rels;
+			__emitter.emit(fluxConstants.STORE_RELATIVE);
+			break;
 	}
 });
 export default appStore;

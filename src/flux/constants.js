@@ -6,4 +6,5 @@ export default {
 	MODIFY_STORED_GRIDS_POS:'modify stored_ rids pos',
 	STORE_RELATIVE:'store the relatives',
 	SAVE_DRAG_POS:'SAVE_DRAG_POS',
+	STORE_RELATIVE:'store the relatives',
 };

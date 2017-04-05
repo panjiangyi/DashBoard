@@ -12,17 +12,6 @@ import agentFac from './agentFac';
 
 let children = [];
 let agent = null;
-var statusfac = (function () {
-	let gridStates = [];
-	return {
-		save(o, i) {
-			gridStates[i] = o;
-		},
-		getState(i) {
-			return gridStates[i];
-		},
-	}
-})()
 let dragListener = (function () {
 	let lastMouseX = 0,
 		lastMouseY = 0,
@@ -38,7 +27,7 @@ let dragListener = (function () {
 			index = this.getAttribute('data-index');
 			this.style.zIndex = 999;
 			if (lastTarget !== this) {
-				let oldXY = statusfac.getState(index);
+				let oldXY = dragStore.getState(index);
 				oldXY ? (oldEleX = oldXY.x, oldEleY = oldXY.y) : (oldEleX = 0, oldEleY = 0);
 				target = null;
 			};
@@ -97,7 +86,7 @@ let dragListener = (function () {
 function saveGridState(nodeInfo) {
 	//修改Store中的方块信息
 	action.modifyStoredGrids(nodeInfo);
-	statusfac.save({
+	action.saveGridStates({
 		x: nodeInfo.x,
 		y: nodeInfo.y
 	}, nodeInfo.ele.getAttribute('data-index'));

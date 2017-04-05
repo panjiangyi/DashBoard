@@ -44,12 +44,16 @@ export default class DragDiv extends Component {
 			let nodeBottom = nodeinfo.y + nodeinfo.h
 			dis = dis > nodeBottom ? dis : nodeBottom;
 		}
-		Object.assign(nodeinfo,{
-			y:dis+10
+		Object.assign(nodeinfo, {
+			y: dis + 10
 		})
 		grid.style.transition = 'all 0.5s ease';
-		grid.style.transform = `translate(${nodeinfo.x}px, ${dis+10}px)`;
+		grid.style.transform = `translate(${nodeinfo.x}px, ${dis + 10}px)`;
 		action.modifyStoredGrids(nodeinfo);
+		action.saveGridStates({
+			x: nodeinfo.x,
+			y: nodeinfo.y
+		}, grid.getAttribute('data-index'));
 	}
 	removeTransition = () => {
 		let target = this.refs.grid;

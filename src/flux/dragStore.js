@@ -7,7 +7,7 @@ import fluxConstants from './constants';
 let __emitter = new EventEmitter();
 let gridStates = []
 let appStore = {
-	getState(I) {
+	getState(i) {
 		return gridStates[i];
 	}
 };

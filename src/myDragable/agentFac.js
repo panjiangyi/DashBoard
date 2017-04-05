@@ -30,11 +30,11 @@ export default class Tool {
         disable(this)
 
 
-        // console.log('---------start-------------')
+        console.log('---------start-------------')
         trig(oldAgentXY)
-        // console.log('---------middle-------------')
+        console.log('---------middle-------------')
         trig(agentPos)
-        //  console.log('----------end------------')
+         console.log('----------end------------')
         // console.log(oldAgentXY,agentPos)
         oldAgentXY.x = agentPos.x;
         oldAgentXY.y = agentPos.y;
@@ -48,6 +48,7 @@ export default class Tool {
 }
 function trig(nodeInfo, node) {
     let eleArr = Tools.getAllRel(nodeInfo, 'below');
+    console.log(eleArr)
     let iArr = [];
     eleArr.sort((a, b) => {
         let cssa = Tools.getGridCss.call(a);
