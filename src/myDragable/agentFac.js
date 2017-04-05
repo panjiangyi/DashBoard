@@ -1,6 +1,6 @@
 import initMap from './initMap';
 import Tools from './Tools';
-import { trigger } from './event';
+import { homeTrigger } from './event';
 import action from './../flux/action';
 let oldAgentXY = { ele: null, x: 0, y: 0, w: 0, h: 0 };
 let agent = null;
@@ -12,6 +12,7 @@ export default class Tool {
         this.style.width = pos.w + 'px';
         this.style.height = pos.h + 'px';
         this.style.display = 'block';
+        // this.style.zIndex = '500';
         agent = this;
     }
     static dragging(x, y) {
@@ -30,11 +31,11 @@ export default class Tool {
         disable(this)
 
 
-        console.log('---------start-------------')
+        // console.log('---------start-------------')
         trig(oldAgentXY)
-        console.log('---------middle-------------')
+        // console.log('---------middle-------------')
         trig(agentPos)
-         console.log('----------end------------')
+        //  console.log('----------end------------')
         // console.log(oldAgentXY,agentPos)
         oldAgentXY.x = agentPos.x;
         oldAgentXY.y = agentPos.y;
@@ -43,12 +44,13 @@ export default class Tool {
     static end(currentEle) {
         able(currentEle)
         agent.style.display = 'none';
+        // agent.style.zIndex = 'auto';
         return oldAgentXY;
     }
 }
-function trig(nodeInfo, node) {
+function trig(nodeInfo) {
     let eleArr = Tools.getAllRel(nodeInfo, 'below');
-    console.log(eleArr)
+    // console.log(eleArr)
     let iArr = [];
     eleArr.sort((a, b) => {
         let cssa = Tools.getGridCss.call(a);
@@ -59,7 +61,7 @@ function trig(nodeInfo, node) {
         let index = d.getAttribute('data-index');
         iArr.push(index)
     })
-    trigger(iArr, node);
+    homeTrigger(iArr);
 }
 
 //使被拖动方块不存在与rel中

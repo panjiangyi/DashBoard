@@ -44,3 +44,4 @@ export default class Actions {
 			i: index
 		});
 	}
+}

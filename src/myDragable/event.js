@@ -2,11 +2,19 @@ import {
 	EventEmitter
 } from 'fbemitter';
 let event = new EventEmitter();
-function addListener(callback,i) {
+function addHomeListener(callback,i) {
 	return event.addListener(`getyourselfgrid${i}`, callback);
 };
-function trigger(iarr,node) {
+function homeTrigger(iarr,node) {
 	// console.log('trigger')
 	iarr.forEach(i=>event.emit(`getyourselfgrid${i}`,node))
 };
-export { addListener, trigger } 
+
+
+function addRelListener(callback) {
+	return event.addListener('getyourallgrid', callback);
+};
+function relTrigger() {
+	event.emit('getyourallgrid');
+};
+export { addHomeListener, homeTrigger,addRelListener, relTrigger} 

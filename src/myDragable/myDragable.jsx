@@ -9,9 +9,10 @@ import judgePostion from './beyondOrBlow';
 import initMap from './initMap';
 import Tools from './Tools';
 import agentFac from './agentFac';
-
+import {  relTrigger } from './event';
 let children = [];
 let agent = null;
+let dragTarget = null;
 let dragListener = (function () {
 	let lastMouseX = 0,
 		lastMouseY = 0,
@@ -24,6 +25,7 @@ let dragListener = (function () {
 	return {
 		dragStart(e) {
 			e.preventDefault();
+			dragTarget = this;
 			index = this.getAttribute('data-index');
 			this.style.zIndex = 999;
 			if (lastTarget !== this) {
@@ -35,13 +37,16 @@ let dragListener = (function () {
 			lastMouseX = e.pageX;
 			lastMouseY = e.pageY;
 			document.addEventListener('mousemove', dragListener.dragging)
+			document.addEventListener('mouseup', dragListener.dragEnd)
 			//推拽开始时方块位置大小
 			let nodeInfo = Tools.getGridCss.call(this);
+			// console.log('succes')
 			agentFac.start.call(agent, nodeInfo);
 			let relative = Tools.getAllRel(nodeInfo, 'below')
 			saveGridState(nodeInfo)
 		},
 		dragging: function (e) {
+			relTrigger();
 			e.preventDefault();
 			let offsetX = e.pageX;
 			let offsetY = e.pageY;
@@ -59,13 +64,13 @@ let dragListener = (function () {
 		dragEnd(e) {
 			e.preventDefault();
 			//推拽结束后方块位置大小
-			let nodeInfo = Tools.getGridCss.call(this);
+			let nodeInfo = Tools.getGridCss.call(dragTarget);
 			//拖拽托书后方块的归宿
 			// let targetPos = targetArea(nodeInfo);
-			let targetPos = agentFac.end(this);
+			let targetPos = agentFac.end(dragTarget);
 			//方块归位
 			// console.log(targetPos)
-			goHome.call(this, nodeInfo, targetPos);
+			goHome.call(dragTarget, nodeInfo, targetPos);
 			//归位后的位置与拖拽结束后的位置合并
 			Object.assign(nodeInfo, targetPos);
 			//方块归位后，与其他方块的空间关系
@@ -164,13 +169,13 @@ export default class MyDragable extends Component {
 		this.props.children.forEach(function (ele, i) {
 			children.push(React.cloneElement(ele, {
 				mousedown: dragListener.dragStart,
-				mouseup: dragListener.dragEnd,
+				// mouseup: dragListener.dragEnd,
 				key: i
 			}))
 		})
 		return (
 			<div ref='container' style={{ position: 'relative', backgroundColor: 'red', touchAction: 'none' }}>
-				<div id='agent' ref='agent' style={{ display: 'none', height: '100px', width: '100px', backgroundColor: 'rgba(255,255,0,0.5)', position: 'absolute', left: '0px', right: '0px', zIndex: '998' }}> </div>
+				<div id='agent' ref='agent' style={{ display: 'none', height: '100px', width: '100px', backgroundColor: 'rgba(255,255,0,0.5)', position: 'absolute', left: '0px', right: '0px' }}> </div>
 				{children}
 			</div>
 		);
