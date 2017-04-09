@@ -73,12 +73,8 @@ let dragListener = (function () {
 			goHome.call(dragTarget, nodeInfo, targetPos);
 			//归位后的位置与拖拽结束后的位置合并
 			Object.assign(nodeInfo, targetPos);
-			//方块归位后，与其他方块的空间关系
-			// console.log(nodeInfo)
-			let relative = Tools.getAllRel(nodeInfo, 'below')
-			// console.log('end:',relative);
 			//修改Store和statusfac中的方块信息
-			saveGridState(nodeInfo)
+			saveGridState(nodeInfo);
 			oldEleX = targetPos.x;
 			oldEleY = targetPos.y;
 			//取消拖拽事件侦听
@@ -175,7 +171,7 @@ export default class MyDragable extends Component {
 		})
 		return (
 			<div ref='container' style={{ position: 'relative', backgroundColor: 'red', touchAction: 'none' }}>
-				<div id='agent' ref='agent' style={{ display: 'none', height: '100px', width: '100px', backgroundColor: 'rgba(255,255,0,0.5)', position: 'absolute', left: '0px', right: '0px' }}> </div>
+				<div id='agent' ref='agent' style={{boxShadow:'10px 10px 5px #888888', display: 'none', height: '100px', width: '100px', backgroundColor: 'rgba(255,255,0,0.5)', position: 'absolute', left: '0px', right: '0px' }}> </div>
 				{children}
 			</div>
 		);

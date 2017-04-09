@@ -48,6 +48,7 @@ function getPos() {
 			//上方最远
 			let farTop = 0;
 			let beyondRel = rels.beyond;
+			beyondRel.push(...rels.equal)
 			beyondRel.sort((a, b) => {
 				return a.y - b.y
 			})

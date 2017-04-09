@@ -2,6 +2,7 @@ import initMap from './initMap';
 import Tools from './Tools';
 import { homeTrigger } from './event';
 import action from './../flux/action';
+import store from './../flux/store';
 let oldAgentXY = { ele: null, x: 0, y: 0, w: 0, h: 0 };
 let agent = null;
 export default class Tool {
@@ -32,24 +33,23 @@ export default class Tool {
 
 
         // console.log('---------start-------------')
-        trig(oldAgentXY)
+        trig(oldAgentXY,'start')
         // console.log('---------middle-------------')
-        trig(agentPos)
+        trig(agentPos,'end')
         //  console.log('----------end------------')
         // console.log(oldAgentXY,agentPos)
         oldAgentXY.x = agentPos.x;
         oldAgentXY.y = agentPos.y;
         oldAgentXY.ele = agentPos.ele;
     }
-    static end(currentEle) {
-        able(currentEle)
+    static end() {
         agent.style.display = 'none';
         // agent.style.zIndex = 'auto';
         return oldAgentXY;
     }
 }
-function trig(nodeInfo) {
-    let eleArr = Tools.getAllRel(nodeInfo, 'below');
+function trig(nodeInfo,state) {
+    let eleArr = Tools.getAllRel(nodeInfo, 'below',true);
     // console.log(eleArr)
     let iArr = [];
     eleArr.sort((a, b) => {
@@ -61,7 +61,7 @@ function trig(nodeInfo) {
         let index = d.getAttribute('data-index');
         iArr.push(index)
     })
-    homeTrigger(iArr);
+    homeTrigger(iArr,state);
 }
 
 //使被拖动方块不存在与rel中

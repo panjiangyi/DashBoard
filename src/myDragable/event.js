@@ -2,19 +2,31 @@ import {
 	EventEmitter
 } from 'fbemitter';
 let event = new EventEmitter();
-function addHomeListener(callback,i) {
+//home 事件
+function addHomeListener(callback, i) {
 	return event.addListener(`getyourselfgrid${i}`, callback);
 };
-function homeTrigger(iarr,node) {
+function homeTrigger(iarr, state) {
 	// console.log('trigger')
-	iarr.forEach(i=>event.emit(`getyourselfgrid${i}`,node))
+	iarr.forEach((i, index) => {
+		event.emit(`getyourselfgrid${i}`, state);
+	})
+	storeTrigger()
 };
 
-
+//取得每个方块自己关系的事件
 function addRelListener(callback) {
 	return event.addListener('getyourallgrid', callback);
 };
 function relTrigger() {
 	event.emit('getyourallgrid');
 };
-export { addHomeListener, homeTrigger,addRelListener, relTrigger} 
+//home结束后，保存状态的事件
+function addStoreListener(callback) {
+	return event.addListener('getyourallgridStored', callback);
+};
+function storeTrigger() {
+	// console.log('getyourallgridStored');
+	event.emit('getyourallgridStored');
+};
+export { addHomeListener, homeTrigger, addRelListener, relTrigger, addStoreListener } 

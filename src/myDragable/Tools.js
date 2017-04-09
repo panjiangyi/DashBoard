@@ -21,12 +21,17 @@ export default class Tools {
 		let originRel = judgePostion.gridDetermine.call(node.ele, node.x, node.y, node.w, node.h);
 		return originRel
 	}
-	static getAllRel(node, dir) {
-		let dirRel = Tools.gridRels(node)[dir];//直接和自己有关的方块
+	static getAllRel(node, dir, needEqual) {
+		let rels = Tools.gridRels(node);
+		let dirRel = rels[dir];//直接和自己有关的方块
 		let relSet = new Set();
+		if (needEqual) {
+			dirRel.push(...rels['equal'])
+		}
 		dirRel.forEach(d => {
 			relSet.add(d.ele)
 		})
+
 		for (let i = 0; i < dirRel.length; i++) {
 			let ele = dirRel[i].ele
 			let index = ele.getAttribute('data-index');
@@ -35,7 +40,8 @@ export default class Tools {
 				rel.forEach(d => {
 					relSet.add(d.ele)
 				})
-			} catch(e) {
+				// console.log(rel.equal)
+			} catch (e) {
 				console.debug(e)
 			}
 		}

@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import action from '../flux/action';
 import Tools from './Tools';
-import { addRelListener, addHomeListener } from './event';
+import { addRelListener, addHomeListener,addStoreListener } from './event';
 export default class DragDiv extends Component {
 	constructor(props) {
 		super(props);
@@ -30,6 +30,9 @@ export default class DragDiv extends Component {
 		this.stroeGrid(this.dragedDivCss);
 		addHomeListener(this.move, this.props.index)
 		addRelListener(this.getRel)
+		addStoreListener(this.thenStore)
+		//得到agent
+		this.agent = document.getElementById('agent')
 	}
 	getRel = () => {
 		let target = this.refs.grid;
@@ -38,18 +41,26 @@ export default class DragDiv extends Component {
 		let upDn = {
 			beyond: rels.beyond,
 			below: rels.below,
+			equal: rels.equal
 		}
 		action.StoreRels(upDn, this.props.index);
+		// if(this.props.index===16){
+		// 	console.log('161616:',upDn)
+		// }
 	}
-	move = () => {
+	move = (state) => {
 		let grid = this.refs.grid;
-		let nodeinfo = Tools.getGridCss.call(grid)
-		let beyondRels = Tools.getAllRel(nodeinfo, 'beyond');
-		console.log(`${this.props.index}:`, beyondRels)
+		let nodeinfo = Tools.getGridCss.call(grid);
+		let agentInfo = Tools.getGridCss.call(this.agent);
+		let beyondRels = Tools.getAllRel(nodeinfo, 'beyond', true);
+		if (this.isAgentUpon(nodeinfo,agentInfo)) {
+			beyondRels.push(this.agent);
+		}
+		// console.log(`${this.props.index}:`, beyondRels)
 		let dis = 10;
 		for (let i = 0; i < beyondRels.length; i++) {
 			let nodeinfo = Tools.getGridCss.call(beyondRels[i]);
-			let nodeBottom = nodeinfo.y + nodeinfo.h+10
+			let nodeBottom = nodeinfo.y + nodeinfo.h + 10
 			dis = dis > nodeBottom ? dis : nodeBottom;
 		}
 		Object.assign(nodeinfo, {
@@ -57,11 +68,38 @@ export default class DragDiv extends Component {
 		})
 		grid.style.transition = 'all 0.5s ease';
 		grid.style.transform = `translate(${nodeinfo.x}px, ${dis}px)`;
+		// action.modifyStoredGrids(nodeinfo);
+		// action.saveGridStates({
+		// 	x: nodeinfo.x,
+		// 	y: nodeinfo.y
+		// }, grid.getAttribute('data-index'));
+		this.storeNodeInfo = nodeinfo;
+		// console.log('首先',this.props.index,nodeinfo)
+	}
+	thenStore=()=>{
+		let nodeinfo = this.storeNodeInfo;
+		if(!nodeinfo)return 
+		// console.log('然后',this.props.index,this.storeNodeInfo)
 		action.modifyStoredGrids(nodeinfo);
 		action.saveGridStates({
 			x: nodeinfo.x,
 			y: nodeinfo.y
-		}, grid.getAttribute('data-index'));
+		}, this.refs.grid.getAttribute('data-index'));
+		this.storeNodeInfo = null;
+	}
+	isAgentUpon(g,a){
+		//是否在上方
+		if(a.y<=g.y){
+			let situation1 = g.x>=a.x&&g.x<=a.x+a.w,
+			situation2 = g.x+g.w>=a.x&&g.x+g.w<=a.x+a.w,
+			situation3 = g.x<a.x&&g.x+g.w>a.x+a.w;
+			if(situation1||situation2||situation3){
+				// console.log(true);
+				return true
+			}
+		}
+		// console.log(false);
+		return false
 	}
 	removeTransition = () => {
 		let target = this.refs.grid;
