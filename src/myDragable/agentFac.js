@@ -22,7 +22,6 @@ export default class Tool {
     }
     static dragging(x, y) {
         //this是被拖动的方块
-        console.log('dsfdsf')
         let agentPos = initMap.whereToDrop({
             ele: this,
             x: x,
