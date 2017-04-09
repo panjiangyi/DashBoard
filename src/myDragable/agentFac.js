@@ -7,6 +7,10 @@ let oldAgentXY = { ele: null, x: 0, y: 0, w: 0, h: 0 };
 let agent = null;
 export default class Tool {
     static start(pos) {
+        //this是agent
+        oldAgentXY.ele = pos.ele;
+        oldAgentXY.x =pos.x; 
+        oldAgentXY.y =pos.y;
         oldAgentXY.w = pos.w;
         oldAgentXY.h = pos.h;
         this.style.transform = `translate(${pos.x}px, ${pos.y}px)`;
@@ -17,6 +21,8 @@ export default class Tool {
         agent = this;
     }
     static dragging(x, y) {
+        //this是被拖动的方块
+        console.log('dsfdsf')
         let agentPos = initMap.whereToDrop({
             ele: this,
             x: x,

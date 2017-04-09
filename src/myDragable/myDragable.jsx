@@ -69,7 +69,7 @@ let dragListener = (function () {
 			// let targetPos = targetArea(nodeInfo);
 			let targetPos = agentFac.end(dragTarget);
 			//方块归位
-			// console.log(targetPos)
+			console.log(targetPos)
 			goHome.call(dragTarget, nodeInfo, targetPos);
 			//归位后的位置与拖拽结束后的位置合并
 			Object.assign(nodeInfo, targetPos);
