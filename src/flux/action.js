@@ -2,39 +2,46 @@ import dispatcher from './dispatcher';
 import fluxConstants from './constants';
 
 export default class Actions {
-	static 	toggleLeftBar() {
+	static toggleLeftBar() {
 		dispatcher.dispatch({
 			type: fluxConstants.TOGGLE_LEFT_BAR,
 		});
 	}
-	static 	toggleDropOutManu(target) {
+	static toggleDropOutManu(target) {
 		dispatcher.dispatch({
 			type: fluxConstants.DROP_OUT_MANU,
-			target:target
+			target: target
 		});
 	}
-	static 	getPhotoUrl() {
+	static getPhotoUrl() {
 		dispatcher.dispatch({
 			type: fluxConstants.PHOTO_URL,
 		});
 	}
-	static 	storeGrids(node) {
+	static storeGrids(node) {
 		dispatcher.dispatch({
 			type: fluxConstants.STORE_GRIDS,
-			node:node
-		});
-	}	
-	static 	modifyStoredGrids(node) {
-		dispatcher.dispatch({
-			type: fluxConstants.MODIFY_STORED_GRIDS_POS,
-			node:node
+			node: node
 		});
 	}
-	static 	StoreRels(rels,index) {
+	static modifyStoredGrids(node) {
+		dispatcher.dispatch({
+			type: fluxConstants.MODIFY_STORED_GRIDS_POS,
+			node: node
+		});
+	}
+	static saveGridStates(o, i) {
+		dispatcher.dispatch({
+			type: fluxConstants.SAVE_DRAG_POS,
+			o: o,
+			i: i
+		});
+	}
+	static StoreRels(rels, index) {
 		dispatcher.dispatch({
 			type: fluxConstants.STORE_RELATIVE,
-			rels:rels,
-			i:index
+			rels: rels,
+			i: index
 		});
 	}
 }

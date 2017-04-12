@@ -30,7 +30,8 @@ export default class Tool {
 			beyondArr = [],
 			noCrossArr = [],
 			leftArr = [],
-			rightArr = [];
+			rightArr = [],
+			equalArr = [];
 		let corner = {
 			LT: [x, y],
 			/*左上*/
@@ -47,23 +48,28 @@ export default class Tool {
 			if (ele === this) {
 				continue
 			}
-			let a = Tool.pointDetermine.call(null, corner.LT[0], corner.LT[1], node),
 				/*左上*/
-				b = Tool.pointDetermine.call(null, corner.RT[0], corner.RT[1], node),
+			let a = Tool.pointDetermine.call(null, corner.LT[0], corner.LT[1], node),
 				/*右上*/
-				c = Tool.pointDetermine.call(null, corner.LD[0], corner.LD[1], node),
+				b = Tool.pointDetermine.call(null, corner.RT[0], corner.RT[1], node),
 				/*左下*/
-				d = Tool.pointDetermine.call(null, corner.RD[0], corner.RD[1], node); /*右下*/
+				c = Tool.pointDetermine.call(null, corner.LD[0], corner.LD[1], node),
+				/*右下*/
+				d = Tool.pointDetermine.call(null, corner.RD[0], corner.RD[1], node); 
 			// console.log(oneRow(corner, node));
 			let isOneCol = oneCol(a) || oneCol(b) || oneCol(c) || oneCol(d) || (a === 'left' && b === 'right');
 			if (isOneCol) {
-				if (corner.LT[1] <= node.y) {
+				if (corner.LT[1] < node.y) {
 					// console.log('下方', ele)
 					belowArr.push(node);
-				} else if (corner.LD[1] >= node.y + node.h) {
+				} else if(corner.LT[1] === node.y){
+					equalArr.push(node);
+				} else if(corner.LT[1] > node.y){
+					beyondArr.push(node);
+				}/* else if (corner.LD[1] >= node.y + node.h) {
 					// console.log('上方', ele)
 					beyondArr.push(node);
-				}
+				}*/
 			} else if (oneRow(corner, node)) {
 				if (a === 'right' && b === 'right') {
 					// console.log(a,b)
@@ -81,7 +87,8 @@ export default class Tool {
 			beyond: beyondArr,
 			left: leftArr,
 			right: rightArr,
-			noCross: noCrossArr
+			noCross: noCrossArr,
+			equal: equalArr
 		}
 	}
 }
