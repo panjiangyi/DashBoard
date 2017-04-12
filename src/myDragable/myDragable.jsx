@@ -42,7 +42,6 @@ let dragListener = (function () {
 			let nodeInfo = Tools.getGridCss.call(this);
 			// console.log('succes')
 			agentFac.start.call(agent, nodeInfo);
-			let relative = Tools.getAllRel(nodeInfo, 'below')
 			saveGridState(nodeInfo)
 		},
 		dragging: function (e) {
