@@ -8,10 +8,14 @@ function addHomeListener(callback, i) {
 };
 function homeTrigger(iarr, state) {
 	// console.log('trigger')
-	iarr.forEach((i, index) => {
-		event.emit(`getyourselfgrid${i}`, state);
-	})
+	// iarr.forEach((i, index) => {
+	// 	event.emit(`getyourselfgrid${i}`, state);
+	// })
+	for(let i=0;i<iarr.length;i++){
+		event.emit(`getyourselfgrid${iarr[i]}`, state);
+	}
 	storeTrigger()
+
 };
 
 
@@ -27,7 +31,6 @@ function addStoreListener(callback) {
 	return event.addListener('getyourallgridStored', callback);
 };
 function storeTrigger() {
-	// console.log('getyourallgridStored');
 	event.emit('getyourallgridStored');
 };
 export { addHomeListener, homeTrigger, addRelListener, relTrigger, addStoreListener } 

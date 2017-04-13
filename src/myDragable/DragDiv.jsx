@@ -14,7 +14,7 @@ export default class DragDiv extends Component {
 			top: '0px',
 			transform: 'translate(0px, 0px)',
 			cursor: 'pointer',
-			touchAction: 'none',
+			// touchAction: 'none',
 			fontSize: '30px',
 		}
 

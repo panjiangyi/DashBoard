@@ -2,8 +2,8 @@ import Tools from './Tools'
 function getPos() {
 	let rowIndex = 0,
 		colIndex = 0,
-		rows = 10,
-		width = 2000 / rows,
+		rows = 5,
+		width = 500 / rows,
 		h = 200,
 		w = width/1
 	return class fn {
