@@ -1,11 +1,12 @@
 import Tools from './Tools'
+import action from '../flux/action';
 function getPos() {
 	let rowIndex = 0,
 		colIndex = 0,
 		rows = 5,
 		width = 500 / rows,
 		h = 200,
-		w = width/1
+		w = width / 1;
 	return class fn {
 		static initPos() {
 			if (rowIndex > rows) {
@@ -15,6 +16,79 @@ function getPos() {
 			return {
 				x: 10 * (rowIndex + 1) + width * rowIndex++,
 				y: h * colIndex + 10 * (colIndex + 1)
+			}
+		}
+		static superiorInit(grids, conWidth) {
+			// console.log(css.width);
+			let last;
+			grids.sort((a, b) => {
+				let define;
+				if (Math.abs(b.y - a.y) < b.h) {//一排
+					if (a.x - b.x <= 0) {
+						define = -1;
+					} else if (a.x - b.x > 0) {
+						define = 1;
+					}
+				} else {//不是一排
+					if (a.y >= b.y) {
+						define = 1
+					} else {
+						define = -1
+					}
+				}
+				// console.log(`${a.ele.innerHTML}--${b.ele.innerHTML}:`, define)
+
+				return define
+			})
+			//排序好后开始排队
+			for (let i = 0; i < grids.length; i++) {
+				let x = 10, y = 10;
+				let tempGrid = grids[i];
+				let curEle = tempGrid.ele;
+				let curEleIndex = curEle.getAttribute('data-index');
+				if (i !== 0) {
+					// let rels = Tools.gridRels(tempGrid);
+					//对左边方块
+					let leftArr = Tools.gridRels(tempGrid).left;
+					leftArr.sort((a, b) => a.x - b.x);
+					if (leftArr.length > 0) {
+						let leftEle = leftArr[leftArr.length - 1];
+						x = leftEle.x + leftEle.w + 10;
+					}
+
+					//对上方方块
+					let nodeInfo = {
+						ele: curEle,
+						x: x,
+						y: tempGrid.y,
+						w: tempGrid.w,
+						h: tempGrid.h
+					}
+					let beyondArr = Tools.gridRels(nodeInfo).beyond;
+					let upY = 10;
+					if (beyondArr.length > 0) {
+						beyondArr.sort((a, b) => a.y - b.y);
+						let upELe = beyondArr[beyondArr.length - 1];
+						let a = upELe.y;
+						let b = upELe.h;
+					console.log(curEle.innerHTML,  upELe)
+						upY = a + b + 10;
+					}
+					y = upY;
+					
+				}
+				let newInfo = {};
+				Object.assign(newInfo, tempGrid, {
+					x: x,
+					y: y
+				})
+				action.modifyStoredGrids(newInfo, curEleIndex);
+				action.saveGridStates({
+					x: x,
+					y: y,
+				}, curEleIndex);
+				setCss(curEle, x, y)
+
 			}
 		}
 		static whereToDrop(pos) {
@@ -39,8 +113,8 @@ function getPos() {
 			let targetLast = {
 				// x: x * w + 10 * (x + 1) - w,
 				// y: y * h + 10 * (y + 1)
-				x: x * w  - w,
-				y: y * h 				
+				x: x * w - w,
+				y: y * h
 			}
 			if (farRightX > targetLast.x) {
 				target.x = farRightX + 10;
@@ -84,4 +158,11 @@ function convert(arr) {
 		copy[i] = arr[i].ele
 	}
 	return copy
+}
+//设置css
+function setCss(node, x, y) {
+	node.style.left = '0px';
+	node.style.top = '0px';
+	node.style.transition = 'all 0.5s ease';
+	node.style.transform = `translate(${x}px, ${y}px)`;
 }

@@ -143,19 +143,12 @@ export default class MyDragable extends Component {
 	componentDidMount() {
 		let grids = Store.getState().gridsNode;
 		agent = this.refs.agent;
-		let css = document.defaultView.getComputedStyle(this.refs.container);
-		console.log(css.width);
+		let conWidth = document.defaultView.getComputedStyle(this.refs.container).width;
+
 		//加载动画
 		setTimeout(() => {
-			for (let i = 0; i < grids.length; i++) {
-				let ele = grids[i].ele;
-				if (ele === agent) {
-					continue
-				}
-				firstTimeToState(grids[i].ele);
-			}
+			initMap.superiorInit(grids,conWidth);
 		}, 0)
-
 	}
 	componentWillUnmount() {
 		this.storeSubscription.remove();
