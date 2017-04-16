@@ -23,23 +23,24 @@ function getPos() {
 			let last;
 			grids.sort((a, b) => {
 				let define;
-				if (Math.abs(b.y - a.y) < b.h) {//一排
-					if (a.x - b.x <= 0) {
-						define = -1;
-					} else if (a.x - b.x > 0) {
-						define = 1;
-					}
-				} else {//不是一排
-					if (a.y >= b.y) {
-						define = 1
-					} else {
+				if(a.x-b.x<=0){
+					if(b.x-a.x<a.w){//一列
+						define = a.y - b.y
+					} else { //不是一列
 						define = -1
+					}
+				} else if(a.x-b.x>0){
+					if(a.x-b.x<b.w){//一列
+						define = a.y - b.y
+					} else {//不是一列
+						define = 1
 					}
 				}
 				// console.log(`${a.ele.innerHTML}--${b.ele.innerHTML}:`, define)
 
 				return define
 			})
+			// grids.forEach(d=>console.log(d.ele.innerHTML))
 			//排序好后开始排队
 			for (let i = 0; i < grids.length; i++) {
 				let x = 10, y = 10;
@@ -53,7 +54,8 @@ function getPos() {
 					leftArr.sort((a, b) => a.x - b.x);
 					if (leftArr.length > 0) {
 						let leftEle = leftArr[leftArr.length - 1];
-						x = leftEle.x + leftEle.w + 10;
+						// x = leftEle.x + leftEle.w + 10;
+						x = tempGrid.x
 					}
 
 					//对上方方块
@@ -71,7 +73,6 @@ function getPos() {
 						let upELe = beyondArr[beyondArr.length - 1];
 						let a = upELe.y;
 						let b = upELe.h;
-					console.log(curEle.innerHTML,  upELe)
 						upY = a + b + 10;
 					}
 					y = upY;
@@ -165,4 +166,13 @@ function setCss(node, x, y) {
 	node.style.top = '0px';
 	node.style.transition = 'all 0.5s ease';
 	node.style.transform = `translate(${x}px, ${y}px)`;
+}
+//从数组中找到元素
+function lkEle(grids,ele){
+	for(let i=0;i<grids.length;i++){
+		if(grids[i].ele===ele){
+			return i;
+		}
+	}
+	return -1;
 }

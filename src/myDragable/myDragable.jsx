@@ -76,7 +76,7 @@ let dragListener = (function () {
 			oldEleY = targetPos.y;
 			//取消拖拽事件侦听
 			document.removeEventListener('mousemove', dragListener.dragging)
-
+			document.removeEventListener('mouseup', dragListener.dragEnd)
 		}
 	}
 })()
@@ -137,8 +137,7 @@ export default class MyDragable extends Component {
 
 	}
 	componentWillMount() {
-		this.storeSubscription = Store.addListener(fluxConstants.STORE_GRIDS, () => {
-		});
+
 	}
 	componentDidMount() {
 		let grids = Store.getState().gridsNode;
@@ -151,7 +150,6 @@ export default class MyDragable extends Component {
 		}, 0)
 	}
 	componentWillUnmount() {
-		this.storeSubscription.remove();
 	}
 	render() {
 		children = []

@@ -2,6 +2,10 @@ import React, { Component } from 'react';
 import action from '../flux/action';
 import Tools from './Tools';
 import { addRelListener, addHomeListener,addStoreListener } from './event';
+let gridWH = {
+	w:0,
+	h:0
+}
 export default class DragDiv extends Component {
 	constructor(props) {
 		super(props);
@@ -32,7 +36,9 @@ export default class DragDiv extends Component {
 		addRelListener(this.getRel)
 		addStoreListener(this.thenStore)
 		//得到agent
-		this.agent = document.getElementById('agent')
+		this.agent = document.getElementById('agent');
+		//resize
+		this.refs.resize.addEventListener('mousedown',resizer.dragStart)
 	}
 	getRel = () => {
 		let target = this.refs.grid;
@@ -124,7 +130,43 @@ export default class DragDiv extends Component {
 				data-index={this.props.index}
 				style={this.dragedDivCss}>
 				{this.props.index}
+				<span ref='resize' style={{cursor:'se-resize',position:'absolute',right:'0px',bottom:'0px'}}>///</span>
 			</div>
 		)
 	}
 }
+
+
+let resizer = (function () {
+	let originMouseX = 0,
+		originMouseY = 0,
+		oriW = 0,
+		oriH = 0,
+		target;
+	return {
+		dragStart(e) {
+			target = this.parentNode;
+			oriW = +target.style.width.split('px')[0];
+			oriH = +target.style.height.split('px')[0];
+			e.stopPropagation()
+			originMouseX = e.pageX;
+			originMouseY = e.pageY;
+			document.addEventListener('mousemove', resizer.dragging)
+			document.addEventListener('mouseup', resizer.dragEnd)
+		},
+		dragging: function (e) {
+			e.preventDefault()
+			let offsetX = e.pageX;
+			let offsetY = e.pageY;
+			let moveX = offsetX - originMouseX;
+			let moveY = offsetY - originMouseY;
+			target.style.width = oriW+moveX+'px';
+			target.style.height = oriH+moveY+'px';
+		},
+		dragEnd(e) {
+			//取消拖拽事件侦听
+			document.removeEventListener('mousemove', resizer.dragging)
+			document.removeEventListener('mouseup', resizer.dragEnd)
+		}
+	}
+})()
