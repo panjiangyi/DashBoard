@@ -1,11 +1,9 @@
 import React, { Component } from 'react';
 import action from '../flux/action';
 import Tools from './Tools';
-import { addRelListener, addHomeListener,addStoreListener } from './event';
-let gridWH = {
-	w:0,
-	h:0
-}
+import { relTrigger } from './event';
+import { addRelListener, addHomeListener, addStoreListener } from './event';
+let agent;
 export default class DragDiv extends Component {
 	constructor(props) {
 		super(props);
@@ -36,9 +34,9 @@ export default class DragDiv extends Component {
 		addRelListener(this.getRel)
 		addStoreListener(this.thenStore)
 		//得到agent
-		this.agent = document.getElementById('agent');
+		agent = document.getElementById('agent');
 		//resize
-		this.refs.resize.addEventListener('mousedown',resizer.dragStart)
+		this.refs.resize.addEventListener('mousedown', resizer.dragStart)
 	}
 	getRel = () => {
 		let target = this.refs.grid;
@@ -50,19 +48,16 @@ export default class DragDiv extends Component {
 			equal: rels.equal
 		}
 		action.StoreRels(upDn, this.props.index);
-		// if(this.props.index===16){
-		// 	console.log('161616:',upDn)
-		// }
+
 	}
 	move = (state) => {
 		let grid = this.refs.grid;
 		let nodeinfo = Tools.getGridCss.call(grid);
-		let agentInfo = Tools.getGridCss.call(this.agent);
+		let agentInfo = Tools.getGridCss.call(agent);
 		let beyondRels = Tools.getAllRel(nodeinfo, 'beyond', true);
-		if (this.isAgentUpon(nodeinfo,agentInfo)) {
-			beyondRels.push(this.agent);
+		if (this.isAgentUpon(nodeinfo, agentInfo)) {
+			beyondRels.push(agent);
 		}
-		// console.log(`${this.props.index}:`, beyondRels)
 		let dis = 10;
 		for (let i = 0; i < beyondRels.length; i++) {
 			let nodeinfo = Tools.getGridCss.call(beyondRels[i]);
@@ -74,18 +69,13 @@ export default class DragDiv extends Component {
 		})
 		grid.style.transition = 'all 0.5s ease';
 		grid.style.transform = `translate(${nodeinfo.x}px, ${dis}px)`;
-		// action.modifyStoredGrids(nodeinfo);
-		// action.saveGridStates({
-		// 	x: nodeinfo.x,
-		// 	y: nodeinfo.y
-		// }, grid.getAttribute('data-index'));
+
+		//保存方块信息，以备存储
 		this.storeNodeInfo = nodeinfo;
-		// console.log('首先',this.props.index,nodeinfo)
 	}
-	thenStore=()=>{
+	thenStore = () => {
 		let nodeinfo = this.storeNodeInfo;
-		if(!nodeinfo)return 
-		// console.log('然后',this.props.index,this.storeNodeInfo)
+		if (!nodeinfo) return
 		action.modifyStoredGrids(nodeinfo);
 		action.saveGridStates({
 			x: nodeinfo.x,
@@ -93,13 +83,13 @@ export default class DragDiv extends Component {
 		}, this.refs.grid.getAttribute('data-index'));
 		this.storeNodeInfo = null;
 	}
-	isAgentUpon(g,a){
+	isAgentUpon(g, a) {
 		//是否在上方
-		if(a.y<=g.y){
-			let situation1 = g.x>=a.x&&g.x<=a.x+a.w,
-			situation2 = g.x+g.w>=a.x&&g.x+g.w<=a.x+a.w,
-			situation3 = g.x<a.x&&g.x+g.w>a.x+a.w;
-			if(situation1||situation2||situation3){
+		if (a.y <= g.y) {
+			let situation1 = g.x >= a.x && g.x <= a.x + a.w,
+				situation2 = g.x + g.w >= a.x && g.x + g.w <= a.x + a.w,
+				situation3 = g.x < a.x && g.x + g.w > a.x + a.w;
+			if (situation1 || situation2 || situation3) {
 				// console.log(true);
 				return true
 			}
@@ -130,7 +120,8 @@ export default class DragDiv extends Component {
 				data-index={this.props.index}
 				style={this.dragedDivCss}>
 				{this.props.index}
-				<span ref='resize' style={{cursor:'se-resize',position:'absolute',right:'0px',bottom:'0px'}}>///</span>
+				{/*<span ref='resize' style={{cursor:'se-resize',position:'absolute',right:'0px',bottom:'0px'}}>///</span>*/}
+				<img ref='resize' style={{ cursor: 'se-resize', height: '12px', width: '12px', position: 'absolute', right: '0px', bottom: '0px' }} src='assets/imgs/resize-corner.png' />
 			</div>
 		)
 	}
@@ -142,28 +133,62 @@ let resizer = (function () {
 		originMouseY = 0,
 		oriW = 0,
 		oriH = 0,
+		oriInfo,
+		finalW,
+		finalH,
 		target;
 	return {
 		dragStart(e) {
 			target = this.parentNode;
-			oriW = +target.style.width.split('px')[0];
-			oriH = +target.style.height.split('px')[0];
+			target.style.zIndex = 999;
+			oriInfo = Tools.getGridCss.call(target);
+			oriW = oriInfo.w;
+			oriH = oriInfo.h;
 			e.stopPropagation()
 			originMouseX = e.pageX;
 			originMouseY = e.pageY;
 			document.addEventListener('mousemove', resizer.dragging)
 			document.addEventListener('mouseup', resizer.dragEnd)
 		},
-		dragging: function (e) {
+		dragging(e) {
 			e.preventDefault()
 			let offsetX = e.pageX;
 			let offsetY = e.pageY;
 			let moveX = offsetX - originMouseX;
 			let moveY = offsetY - originMouseY;
-			target.style.width = oriW+moveX+'px';
-			target.style.height = oriH+moveY+'px';
+			finalW = oriW + moveX;
+			finalH = oriH + moveY;
+			finalW = finalW<50?50:finalW;
+			finalH = finalH<50?50:finalH;
+			target.style.width = finalW + 'px';
+			target.style.height = finalH + 'px';
 		},
 		dragEnd(e) {
+			let transXY = target.style.transform.split('(')[1].split('px'),
+				transX = +transXY[0],
+				transY = +transXY[1].split(' ')[1];
+			let nodeInfo = {
+				ele: target,
+				x: transX,
+				y: transY,
+				w: finalW,
+				h: finalH
+			}
+			//方块失效
+			Tools.disable(target)
+			//激活agent
+			agent.style.transform = `translate(${transX}px, ${transY}px)`;
+			agent.style.width = finalW + 'px';
+			agent.style.height = finalH + 'px';
+			// agent.style.display = 'block';
+			//计算每个方块位置信息
+			relTrigger()
+			//触发其他方块移动
+			Tools.trig(oriInfo)
+			Tools.trig(nodeInfo)
+			//保存当前方块信息
+			Tools.saveGridState(nodeInfo)
+			target.style.zIndex = 'auto';
 			//取消拖拽事件侦听
 			document.removeEventListener('mousemove', resizer.dragging)
 			document.removeEventListener('mouseup', resizer.dragEnd)

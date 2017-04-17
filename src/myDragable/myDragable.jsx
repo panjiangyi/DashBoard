@@ -43,7 +43,7 @@ let dragListener = (function () {
 			agentFac.start.call(agent, nodeInfo);
 			saveGridState(nodeInfo)
 		},
-		dragging: function (e) {
+		dragging(e) {
 			relTrigger();
 			e.preventDefault();
 			let offsetX = e.pageX;
@@ -140,6 +140,7 @@ export default class MyDragable extends Component {
 
 	}
 	componentDidMount() {
+		relTrigger();
 		let grids = Store.getState().gridsNode;
 		agent = this.refs.agent;
 		let conWidth = document.defaultView.getComputedStyle(this.refs.container).width;

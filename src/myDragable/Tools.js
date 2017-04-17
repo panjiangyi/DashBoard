@@ -1,6 +1,45 @@
 import judgePostion from './beyondOrBlow';
 import Store from './../flux/store';
+import action from './../flux/action';
+import { homeTrigger } from './event';
 export default class Tools {
+	static trig(nodeInfo,state) {
+    let eleArr = Tools.getAllRel(nodeInfo, 'below',true);
+    // console.log(eleArr)
+    let iArr = [];
+    eleArr.sort((a, b) => {
+        let cssa = Tools.getGridCss.call(a);
+        let cssb = Tools.getGridCss.call(b)
+        return cssa.y - cssb.y
+    })
+    eleArr.forEach(function (d, i) {
+        let index = d.getAttribute('data-index');
+        iArr.push(index)
+    })
+    homeTrigger(iArr,state);
+}
+	static saveGridState(nodeInfo) {
+		//修改Store中的方块信息
+		action.modifyStoredGrids(nodeInfo);
+		action.saveGridStates({
+			x: nodeInfo.x,
+			y: nodeInfo.y
+		}, nodeInfo.ele.getAttribute('data-index'));
+	}
+	//使被拖动方块不存在与rel中
+	static disable(ele) {
+		action.modifyStoredGrids({
+			ele: ele,
+			x: -100,
+			y: -100,
+			w: 0,
+			h: 0,
+		})
+	}
+	static able(ele) {
+		let nodeinfo = Tools.getGridCss.call(ele);
+		action.modifyStoredGrids(nodeinfo)
+	}
 	static getGridCss() {
 		let ox = +this.style.left.split('px')[0],
 			oy = +this.style.top.split('px')[0],
@@ -35,15 +74,14 @@ export default class Tools {
 		for (let i = 0; i < dirRel.length; i++) {
 			let ele = dirRel[i].ele
 			let index = ele.getAttribute('data-index');
-			try {
+			// try {
 				let rel = Store.getState().rels[index][dir];
 				rel.forEach(d => {
 					relSet.add(d.ele)
 				})
-				// console.log(rel.equal)
-			} catch (e) {
-				console.debug(e)
-			}
+			// } catch (e) {
+				// console.debug(e)
+			// }
 		}
 		return [...relSet]
 	}
