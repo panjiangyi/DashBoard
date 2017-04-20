@@ -20,77 +20,27 @@ function getPos() {
 		}
 		static superiorInit(grids, conWidth) {
 			// console.log(css.width);
-			let last;
-			grids.sort((a, b) => {
-				let define;
-				if(a.x-b.x<=0){
-					if(b.x-a.x<a.w){//一列
-						define = a.y - b.y
-					} else { //不是一列
-						define = -1
-					}
-				} else if(a.x-b.x>0){
-					if(a.x-b.x<b.w){//一列
-						define = a.y - b.y
-					} else {//不是一列
-						define = 1
-					}
-				}
-				// console.log(`${a.ele.innerHTML}--${b.ele.innerHTML}:`, define)
+			grids.sort(initSort)
+			let compositor = compositorify();
 
-				return define
-			})
-			// grids.forEach(d=>console.log(d.ele.innerHTML))
 			//排序好后开始排队
-			for (let i = 0; i < grids.length; i++) {
-				let x = 10, y = 10;
-				let tempGrid = grids[i];
-				let curEle = tempGrid.ele;
-				let curEleIndex = curEle.getAttribute('data-index');
-				if (i !== 0) {
-					// let rels = Tools.gridRels(tempGrid);
-					//对左边方块
-					let leftArr = Tools.gridRels(tempGrid).left;
-					leftArr.sort((a, b) => a.x - b.x);
-					if (leftArr.length > 0) {
-						let leftEle = leftArr[leftArr.length - 1];
-						// x = leftEle.x + leftEle.w + 10;
-						x = tempGrid.x
-					}
-
-					//对上方方块
-					let nodeInfo = {
-						ele: curEle,
-						x: x,
-						y: tempGrid.y,
-						w: tempGrid.w,
-						h: tempGrid.h
-					}
-					let beyondArr = Tools.gridRels(nodeInfo).beyond;
-					let upY = 10;
-					if (beyondArr.length > 0) {
-						beyondArr.sort((a, b) => a.y - b.y);
-						let upELe = beyondArr[beyondArr.length - 1];
-						let a = upELe.y;
-						let b = upELe.h;
-						upY = a + b + 10;
-					}
-					y = upY;
-					
-				}
+			grids.forEach((d, i) => {
 				let newInfo = {};
-				Object.assign(newInfo, tempGrid, {
-					x: x,
-					y: y
+				let curEleIndex = d.ele.getAttribute('data-index');
+				let composited= compositor(d)
+				Object.assign(newInfo, d, {
+					y: composited.y,
+					x: composited.x,
 				})
+				setCss(newInfo);
 				action.modifyStoredGrids(newInfo, curEleIndex);
 				action.saveGridStates({
-					x: x,
-					y: y,
+					x: newInfo.x,
+					y: newInfo.y,
 				}, curEleIndex);
-				setCss(curEle, x, y)
+			})
 
-			}
+
 		}
 		static whereToDrop(pos) {
 			let rels = Tools.gridRels(pos);
@@ -161,18 +111,93 @@ function convert(arr) {
 	return copy
 }
 //设置css
-function setCss(node, x, y) {
+function setCss(nodeInfo) {
+	let node = nodeInfo.ele,
+		x = nodeInfo.x,
+		y = nodeInfo.y;
 	node.style.left = '0px';
 	node.style.top = '0px';
 	node.style.transition = 'all 0.5s ease';
 	node.style.transform = `translate(${x}px, ${y}px)`;
 }
 //从数组中找到元素
-function lkEle(grids,ele){
-	for(let i=0;i<grids.length;i++){
-		if(grids[i].ele===ele){
+function lkEle(grids, ele) {
+	for (let i = 0; i < grids.length; i++) {
+		if (grids[i].ele === ele) {
 			return i;
 		}
 	}
 	return -1;
+}
+//init排序
+function initSort(a, b) {
+	let define;
+	// if(a.x-b.x<=0){
+	// 	if(b.x-a.x<a.w){//一列
+	// 		define = a.y - b.y
+	// 	} else { //不是一列
+	// 		define = -1
+	// 	}
+	// } else if(a.x-b.x>0){
+	// 	if(a.x-b.x<b.w){//一列
+	// 		define = a.y - b.y
+	// 	} else {//不是一列
+	// 		define = 1
+	// 	}
+	// }
+	if (Math.abs(b.y - a.y) < b.h) {//一排
+		if (a.x - b.x <= 0) {
+			define = -1;
+		} else if (a.x - b.x > 0) {
+			define = 1;
+		}
+	} else {//不是一排
+		if (a.y >= b.y) {
+			define = 1
+		} else {
+			define = -1
+		}
+	}
+	return define
+}
+
+function compositorify() {
+	let map = [];
+	function getFromMap(x, y, w, h, index) {
+		let maxY = 0,deltaX =0;
+		for (let i = 0; i < map.length; i++) {
+			let tempMap = map[i];
+			let start = tempMap.start,
+				end = tempMap.start + tempMap.w;
+			let delta = 0;
+			if (start >= x) {
+				delta = end - x
+			} else {
+				delta = x + w - start
+			}
+			if (delta < tempMap.w + w) {
+				//有交集
+				let tempY = tempMap.y + tempMap.h;
+				maxY = maxY>tempY?maxY:tempY;
+			}
+			if ((delta === tempMap.w + w)&&start < x) {
+				deltaX = 10;
+			}
+		}
+		maxY += 10;
+		let maxX = x+deltaX;
+		maxX = maxX===0?10:maxX;
+		map.push({
+			index: index,
+			start:maxX,
+			y: maxY,
+			w: w,
+			h: h
+		})
+		return {y:maxY,x:maxX};
+	}
+	return function (info) {
+		return getFromMap(info.x, info.y, info.w, info.h,info.ele.getAttribute('data-index'))
+	}
+
 }

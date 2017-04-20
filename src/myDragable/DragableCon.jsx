@@ -21,7 +21,7 @@ export default class DragableCon extends Component {
 				<DragDiv index={uniqueIndex()} selfStyle={{backgroundColor:randomColor(),left:'0px',top:'600px'}}/>
 				<DragDiv index={uniqueIndex()} selfStyle={{backgroundColor:randomColor(),left:'400px',top:'400px'}}/>
 				<DragDiv index={uniqueIndex()} selfStyle={{backgroundColor:randomColor(),left:'400px',top:'400px'}}/>
-				<DragDiv index={uniqueIndex()} selfStyle={{backgroundColor:randomColor(),left:'400px',top:'400px'}}/>
+				<DragDiv index={uniqueIndex()} selfStyle={{backgroundColor:randomColor(),left:'400px',top:'400px',height:'300px'}}/>
 				<DragDiv index={uniqueIndex()} selfStyle={{backgroundColor:randomColor(),left:'400px',top:'400px'}}/>
 				<DragDiv index={uniqueIndex()} selfStyle={{backgroundColor:randomColor(),left:'600px',top:'851px',height:'100px'}}/>
 			</MyDragable>
