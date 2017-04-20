@@ -3,21 +3,29 @@ import Store from './../flux/store';
 import action from './../flux/action';
 import { homeTrigger } from './event';
 export default class Tools {
-	static trig(nodeInfo,state) {
-    let eleArr = Tools.getAllRel(nodeInfo, 'below',true);
-    // console.log(eleArr)
-    let iArr = [];
-    eleArr.sort((a, b) => {
-        let cssa = Tools.getGridCss.call(a);
-        let cssb = Tools.getGridCss.call(b)
-        return cssa.y - cssb.y
-    })
-    eleArr.forEach(function (d, i) {
-        let index = d.getAttribute('data-index');
-        iArr.push(index)
-    })
-    homeTrigger(iArr,state);
-}
+	static setCss(nodeInfo) {
+		let node = nodeInfo.ele,
+			x = nodeInfo.x,
+			y = nodeInfo.y;
+		node.style.left = '0px';
+		node.style.top = '0px';
+		node.style.transition = 'all 0.5s ease';
+		node.style.transform = `translate(${x}px, ${y}px)`;
+	}
+	static trig(nodeInfo, state) {
+		let eleArr = Tools.getAllRel(nodeInfo, 'below', true);
+		let iArr = [];
+		eleArr.sort((a, b) => {
+			let cssa = Tools.getGridCss.call(a);
+			let cssb = Tools.getGridCss.call(b)
+			return cssa.y - cssb.y
+		})
+		eleArr.forEach(function (d, i) {
+			let index = d.getAttribute('data-index');
+			iArr.push(index)
+		})
+		homeTrigger(iArr, state);
+	}
 	static saveGridState(nodeInfo) {
 		//修改Store中的方块信息
 		action.modifyStoredGrids(nodeInfo);
@@ -75,12 +83,12 @@ export default class Tools {
 			let ele = dirRel[i].ele
 			let index = ele.getAttribute('data-index');
 			// try {
-				let rel = Store.getState().rels[index][dir];
-				rel.forEach(d => {
-					relSet.add(d.ele)
-				})
+			let rel = Store.getState().rels[index][dir];
+			rel.forEach(d => {
+				relSet.add(d.ele)
+			})
 			// } catch (e) {
-				// console.debug(e)
+			// console.debug(e)
 			// }
 		}
 		return [...relSet]

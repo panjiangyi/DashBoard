@@ -19,7 +19,6 @@ function getPos() {
 			}
 		}
 		static superiorInit(grids, conWidth) {
-			// console.log(css.width);
 			grids.sort(initSort)
 			let compositor = compositorify();
 
@@ -32,7 +31,7 @@ function getPos() {
 					y: composited.y,
 					x: composited.x,
 				})
-				setCss(newInfo);
+				Tools.setCss(newInfo);
 				action.modifyStoredGrids(newInfo, curEleIndex);
 				action.saveGridStates({
 					x: newInfo.x,
@@ -110,16 +109,7 @@ function convert(arr) {
 	}
 	return copy
 }
-//设置css
-function setCss(nodeInfo) {
-	let node = nodeInfo.ele,
-		x = nodeInfo.x,
-		y = nodeInfo.y;
-	node.style.left = '0px';
-	node.style.top = '0px';
-	node.style.transition = 'all 0.5s ease';
-	node.style.transform = `translate(${x}px, ${y}px)`;
-}
+
 //从数组中找到元素
 function lkEle(grids, ele) {
 	for (let i = 0; i < grids.length; i++) {

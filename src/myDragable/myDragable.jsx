@@ -3,9 +3,6 @@ import React, {
 } from 'react';
 import Store from './../flux/store';
 import dragStore from './../flux/dragStore';
-import action from './../flux/action';
-import fluxConstants from './../flux/constants';
-import judgePostion from './beyondOrBlow';
 import initMap from './initMap';
 import Tools from './Tools';
 import agentFac from './agentFac';
@@ -41,7 +38,7 @@ let dragListener = (function () {
 			//推拽开始时方块位置大小
 			let nodeInfo = Tools.getGridCss.call(this);
 			agentFac.start.call(agent, nodeInfo);
-			saveGridState(nodeInfo)
+			Tools.saveGridState(nodeInfo)
 		},
 		dragging(e) {
 			relTrigger();
@@ -71,7 +68,7 @@ let dragListener = (function () {
 			//归位后的位置与拖拽结束后的位置合并
 			Object.assign(nodeInfo, targetPos);
 			//修改Store和statusfac中的方块信息
-			saveGridState(nodeInfo);
+			Tools.saveGridState(nodeInfo);
 			oldEleX = targetPos.x;
 			oldEleY = targetPos.y;
 			//取消拖拽事件侦听
@@ -81,14 +78,7 @@ let dragListener = (function () {
 	}
 })()
 
-function saveGridState(nodeInfo) {
-	//修改Store中的方块信息
-	action.modifyStoredGrids(nodeInfo);
-	action.saveGridStates({
-		x: nodeInfo.x,
-		y: nodeInfo.y
-	}, nodeInfo.ele.getAttribute('data-index'));
-}
+
 
 //回到归宿
 function goHome(originPos, targetPos) {
@@ -126,7 +116,7 @@ function firstTimeToState(node) {
 	node.style.transition = 'all 0.5s ease';
 	node.style.transform = `translate(${pos.x}px, ${pos.y}px)`;
 	let newPos = Tools.getGridCss.call(node);
-	saveGridState(newPos)
+	Tools.saveGridState(newPos)
 }
 
 

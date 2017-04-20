@@ -1,8 +1,5 @@
 import initMap from './initMap';
 import Tools from './Tools';
-import { homeTrigger } from './event';
-import action from './../flux/action';
-import store from './../flux/store';
 let oldAgentXY = { ele: null, x: 0, y: 0, w: 0, h: 0 };
 let agent = null;
 export default class Tool {
@@ -34,13 +31,13 @@ export default class Tool {
         }
         // console.log(Tools.getAllRel(agentPos,'below'))
         agent.style.transform = `translate(${agentPos.x}px, ${agentPos.y}px)`;
-        disable(this)
+        Tools.disable(this)
 
 
         // console.log('---------start-------------')
-        trig(oldAgentXY,'start')
+        Tools.trig(oldAgentXY,'start')
         // console.log('---------middle-------------')
-        trig(agentPos,'end')
+        Tools.trig(agentPos,'end')
         //  console.log('----------end------------')
         // console.log(oldAgentXY,agentPos)
         oldAgentXY.x = agentPos.x;
@@ -53,33 +50,4 @@ export default class Tool {
         return oldAgentXY;
     }
 }
-function trig(nodeInfo,state) {
-    let eleArr = Tools.getAllRel(nodeInfo, 'below',true);
-    // console.log(eleArr)
-    let iArr = [];
-    eleArr.sort((a, b) => {
-        let cssa = Tools.getGridCss.call(a);
-        let cssb = Tools.getGridCss.call(b)
-        return cssa.y - cssb.y
-    })
-    eleArr.forEach(function (d, i) {
-        let index = d.getAttribute('data-index');
-        iArr.push(index)
-    })
-    homeTrigger(iArr,state);
-}
 
-//使被拖动方块不存在与rel中
-function disable(ele){
-    action.modifyStoredGrids({
-        ele:ele,
-        x:-100,
-        y:-100,
-        w:0,
-        h:0,
-    })
-}
-function able(ele){
-    let nodeinfo =Tools.getGridCss.call(ele);
-        action.modifyStoredGrids(nodeinfo)
-}

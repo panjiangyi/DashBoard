@@ -1,9 +1,9 @@
 import React, { Component } from 'react';
 import action from '../flux/action';
 import Tools from './Tools';
-import { relTrigger } from './event';
+import { relTrigger ,homeTrigger} from './event';
 import { addRelListener, addHomeListener, addStoreListener } from './event';
-let agent;
+let agent,outMove;
 export default class DragDiv extends Component {
 	constructor(props) {
 		super(props);
@@ -50,7 +50,7 @@ export default class DragDiv extends Component {
 		action.StoreRels(upDn, this.props.index);
 
 	}
-	move = (state) => {
+	move =()=> {
 		let grid = this.refs.grid;
 		let nodeinfo = Tools.getGridCss.call(grid);
 		let agentInfo = Tools.getGridCss.call(agent);
@@ -137,6 +137,8 @@ let resizer = (function () {
 		finalW,
 		finalH,
 		target;
+	let maxX = null, maxY = null;
+
 	return {
 		dragStart(e) {
 			target = this.parentNode;
@@ -147,6 +149,24 @@ let resizer = (function () {
 			e.stopPropagation()
 			originMouseX = e.pageX;
 			originMouseY = e.pageY;
+
+			//计算右边阻挡方块
+			maxX = null;
+			maxY = null;
+			let rightRel = Tools.gridRels(oriInfo).right;
+			for (let i = 0; i < rightRel.length; i++) {
+				let temp = rightRel[i];
+				if (oriInfo.y > temp.y) {
+					if (!maxX || (maxX > temp.x)) {
+						maxX = temp.x;
+						maxY = temp.y + temp.h;
+
+					}
+				}
+			}
+
+
+
 			document.addEventListener('mousemove', resizer.dragging)
 			document.addEventListener('mouseup', resizer.dragEnd)
 		},
@@ -158,8 +178,8 @@ let resizer = (function () {
 			let moveY = offsetY - originMouseY;
 			finalW = oriW + moveX;
 			finalH = oriH + moveY;
-			finalW = finalW<50?50:finalW;
-			finalH = finalH<50?50:finalH;
+			finalW = finalW < 50 ? 50 : finalW;
+			finalH = finalH < 50 ? 50 : finalH;
 			target.style.width = finalW + 'px';
 			target.style.height = finalH + 'px';
 		},
@@ -175,20 +195,30 @@ let resizer = (function () {
 				h: finalH
 			}
 			//方块失效
-			Tools.disable(target)
+			// Tools.disable(target)
 			//激活agent
-			agent.style.transform = `translate(${transX}px, ${transY}px)`;
+			// agent.style.transform = `translate(${transX}px, ${transY}px)`;
+			agent.style.transform = `translate(${-100000}px, ${-100000}px)`;
 			agent.style.width = finalW + 'px';
 			agent.style.height = finalH + 'px';
-			// agent.style.display = 'block';
+			agent.style.display = 'block';
 			//计算每个方块位置信息
 			relTrigger()
-			//触发其他方块移动
-			Tools.trig(oriInfo)
-			Tools.trig(nodeInfo)
+			//如果右边有方块阻挡
+			if (maxX || maxY) {
+				if (nodeInfo.x + nodeInfo.w > maxX) {
+					nodeInfo.y = maxY + 10
+				}
+			}
+			Tools.setCss(nodeInfo);
 			//保存当前方块信息
 			Tools.saveGridState(nodeInfo)
 			target.style.zIndex = 'auto';
+			//触发其他方块移动
+			homeTrigger([target.getAttribute('data-index')])
+			Tools.trig(oriInfo)
+			Tools.trig(nodeInfo)
+
 			//取消拖拽事件侦听
 			document.removeEventListener('mousemove', resizer.dragging)
 			document.removeEventListener('mouseup', resizer.dragEnd)
