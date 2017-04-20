@@ -21,7 +21,7 @@ module.exports = {
 			// 	presets: ['es2015', 'react']
 			// }
 		}]
-	},
+	}/*,
 	plugins: [
 		new webpack.optimize.UglifyJsPlugin({
 			compress: {
@@ -33,5 +33,5 @@ module.exports = {
 				NODE_ENV: JSON.stringify('production')
 			}
 		}),
-	]
+	]*/
 }
