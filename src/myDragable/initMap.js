@@ -4,20 +4,11 @@ function getPos() {
 	let rowIndex = 0,
 		colIndex = 0,
 		rows = 5,
-		width = 500 / rows,
+		clientWidth = 1920,
+		width = clientWidth / rows,
 		h = 200,
-		w = width / 1;
+		w = width / 10;
 	return class fn {
-		static initPos() {
-			if (rowIndex > rows) {
-				rowIndex = 0;
-				colIndex++
-			}
-			return {
-				x: 10 * (rowIndex + 1) + width * rowIndex++,
-				y: h * colIndex + 10 * (colIndex + 1)
-			}
-		}
 		static superiorInit(grids, conWidth) {
 			grids.sort(initSort)
 			let compositor = compositorify();
@@ -55,7 +46,7 @@ function getPos() {
 			let x = floor(pos.x / w),
 				y = floor(pos.y / h);
 			let target = {
-				x: x * w + 10 * (x + 1),
+				x: x * w,
 				// y: y * h + 10 * (y + 1)
 				// x: x * w,
 				y: y * h
@@ -68,6 +59,10 @@ function getPos() {
 			}
 			if (farRightX > targetLast.x) {
 				target.x = farRightX + 10;
+			}
+			//防止超出屏幕
+			if(target.x+pos.w>clientWidth){
+				target.x = clientWidth - pos.w - 20
 			}
 			//上方最远
 			let farTop = 0;
@@ -122,19 +117,7 @@ function lkEle(grids, ele) {
 //init排序
 function initSort(a, b) {
 	let define;
-	// if(a.x-b.x<=0){
-	// 	if(b.x-a.x<a.w){//一列
-	// 		define = a.y - b.y
-	// 	} else { //不是一列
-	// 		define = -1
-	// 	}
-	// } else if(a.x-b.x>0){
-	// 	if(a.x-b.x<b.w){//一列
-	// 		define = a.y - b.y
-	// 	} else {//不是一列
-	// 		define = 1
-	// 	}
-	// }
+
 	if (Math.abs(b.y - a.y) < b.h) {//一排
 		if (a.x - b.x <= 0) {
 			define = -1;

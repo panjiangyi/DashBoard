@@ -1,9 +1,9 @@
 import React, { Component } from 'react';
 import action from '../flux/action';
 import Tools from './Tools';
-import { relTrigger ,homeTrigger} from './event';
+import { relTrigger, homeTrigger } from './event';
 import { addRelListener, addHomeListener, addStoreListener } from './event';
-let agent,outMove;
+let agent, outMove,container;
 export default class DragDiv extends Component {
 	constructor(props) {
 		super(props);
@@ -34,7 +34,8 @@ export default class DragDiv extends Component {
 		addRelListener(this.getRel)
 		addStoreListener(this.thenStore)
 		//得到agent
-		agent = document.getElementById('agent');
+		if(!agent)agent = document.getElementById('agent');
+		if(!container)container = document.getElementById('container');
 		//resize
 		this.refs.resize.addEventListener('mousedown', resizer.dragStart)
 	}
@@ -50,7 +51,7 @@ export default class DragDiv extends Component {
 		action.StoreRels(upDn, this.props.index);
 
 	}
-	move =()=> {
+	move = () => {
 		let grid = this.refs.grid;
 		let nodeinfo = Tools.getGridCss.call(grid);
 		let agentInfo = Tools.getGridCss.call(agent);
@@ -67,7 +68,7 @@ export default class DragDiv extends Component {
 		Object.assign(nodeinfo, {
 			y: dis
 		})
-		grid.style.transition = 'all 0.5s ease';
+		grid.style.transition = 'transform 0.5s ease';
 		grid.style.transform = `translate(${nodeinfo.x}px, ${dis}px)`;
 
 		//保存方块信息，以备存储
@@ -166,7 +167,6 @@ let resizer = (function () {
 			}
 
 
-
 			document.addEventListener('mousemove', resizer.dragging)
 			document.addEventListener('mouseup', resizer.dragEnd)
 		},
@@ -218,7 +218,8 @@ let resizer = (function () {
 			homeTrigger([target.getAttribute('data-index')])
 			Tools.trig(oriInfo)
 			Tools.trig(nodeInfo)
-
+			// Tools.trig(nodeInfo)
+			container.style.height = Tools.hightCon();
 			//取消拖拽事件侦听
 			document.removeEventListener('mousemove', resizer.dragging)
 			document.removeEventListener('mouseup', resizer.dragEnd)

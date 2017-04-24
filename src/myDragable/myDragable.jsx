@@ -9,6 +9,7 @@ import agentFac from './agentFac';
 import { relTrigger } from './event';
 let children = [];
 let agent = null;
+let container = null;
 let dragTarget = null;
 let dragListener = (function () {
 	let lastMouseX = 0,
@@ -71,9 +72,10 @@ let dragListener = (function () {
 			Tools.saveGridState(nodeInfo);
 			oldEleX = targetPos.x;
 			oldEleY = targetPos.y;
+			container.style.height = Tools.hightCon();
 			//取消拖拽事件侦听
 			document.removeEventListener('mousemove', dragListener.dragging)
-			document.removeEventListener('mouseup', dragListener.dragEnd)
+			document.removeEventListener('mouseup', dragListener.dragEnd);
 		}
 	}
 })()
@@ -85,7 +87,7 @@ function goHome(originPos, targetPos) {
 	if (originPos.y === targetPos.y) {
 		return
 	}
-	this.style.transition = 'all 0.2s ease';
+	this.style.transition = 'transform 0.5s ease';
 	this.style.transform = `translate(${targetPos.x}px, ${targetPos.y}px)`
 }
 //拖拽结束后，方块的归宿
@@ -113,7 +115,7 @@ function firstTimeToState(node) {
 	let pos = initMap.initPos();
 	node.style.left = '0px';
 	node.style.top = '0px';
-	node.style.transition = 'all 0.5s ease';
+	node.style.transition = 'transform 0.5s ease';
 	node.style.transform = `translate(${pos.x}px, ${pos.y}px)`;
 	let newPos = Tools.getGridCss.call(node);
 	Tools.saveGridState(newPos)
@@ -133,11 +135,13 @@ export default class MyDragable extends Component {
 		relTrigger();
 		let grids = Store.getState().gridsNode;
 		agent = this.refs.agent;
+		container = this.refs.container;
 		let conWidth = document.defaultView.getComputedStyle(this.refs.container).width;
 
 		//加载动画
 		setTimeout(() => {
-			initMap.superiorInit(grids,conWidth);
+			initMap.superiorInit(grids, conWidth);
+			container.style.height = Tools.hightCon();
 		}, 0)
 	}
 	componentWillUnmount() {
@@ -152,7 +156,7 @@ export default class MyDragable extends Component {
 			}))
 		})
 		return (
-			<div ref='container' style={{ position: 'relative', backgroundColor: 'red', touchAction: 'none' }}>
+			<div ref='container' id='container' style={{transition:'width,height 0.2s ease',position: 'relative', outline:'1px solid black' }}>
 				<div id='agent' ref='agent' style={{ boxShadow: '10px 10px 5px #888888', display: 'none', height: '100px', width: '100px', backgroundColor: 'rgba(255,255,0,0.5)', position: 'absolute', left: '0px', right: '0px' }}> </div>
 				{children}
 			</div>

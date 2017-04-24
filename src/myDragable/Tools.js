@@ -3,13 +3,26 @@ import Store from './../flux/store';
 import action from './../flux/action';
 import { homeTrigger } from './event';
 export default class Tools {
+	//设置container高度
+	static hightCon() {
+		let allNodes = Store.getState().gridsNode;
+		let maxY = 0;
+		for (let i = 0; i < allNodes.length; i++) {
+			let tempNode = allNodes[i];
+			let tempY = tempNode.y + tempNode.h;
+			if (maxY < tempY) {
+				maxY = tempY
+			}
+		}
+		return maxY + 10 + 'px'
+	}
 	static setCss(nodeInfo) {
 		let node = nodeInfo.ele,
 			x = nodeInfo.x,
 			y = nodeInfo.y;
 		node.style.left = '0px';
 		node.style.top = '0px';
-		node.style.transition = 'all 0.5s ease';
+		node.style.transition = 'transform 0.5s ease';
 		node.style.transform = `translate(${x}px, ${y}px)`;
 	}
 	static trig(nodeInfo, state) {
